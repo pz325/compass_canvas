@@ -161,6 +161,20 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .selected-geometry { stroke: #b16d22; stroke-width: 2.8; opacity: .92; }
 .construction-overlay .selected-geometry.final-geometry { stroke: #85541e; stroke-width: 4; }
 .construction-overlay .point-node > .point-visual { opacity: .12; stroke-width: 1.1; }
+
+/* Final point visibility rules. A hidden point keeps its transparent hit area
+   for snapping and selection, while its visual marker stays absent. */
+.construction-overlay .point-node.standalone-point > .point-visual,
+.construction-overlay .point-node.standalone-point:hover > .point-visual,
+.construction-overlay .point-node.standalone-point:focus > .point-visual { opacity: .78; stroke-width: 1.8; }
+.construction-overlay .point-node.derived-point > .point-visual,
+.construction-overlay .point-node.derived-point:hover > .point-visual,
+.construction-overlay .point-node.derived-point:focus > .point-visual,
+.construction-overlay .point-node.intersection-point > .point-visual,
+.construction-overlay .point-node.intersection-point:hover > .point-visual,
+.construction-overlay .point-node.intersection-point:focus > .point-visual { opacity: 0 !important; stroke-width: 0; }
+.construction-overlay .point-node.derived-point .point-hover-ring,
+.construction-overlay .point-node.intersection-point .point-hover-ring { opacity: 0 !important; }
 .construction-overlay .point-node .point-hover-ring { fill: rgba(230,184,108,.08); stroke: #a86d23; stroke-width: 1.8; opacity: 0; pointer-events: none; vector-effect: non-scaling-stroke; }
 .construction-overlay .point-node:hover > .point-visual,
 .construction-overlay .point-node:focus > .point-visual,
@@ -173,7 +187,9 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
    remain quiet so the geometry stays visually light until hovered. */
 .construction-overlay .point-node.standalone-point > .point-visual { opacity: .78; stroke-width: 1.8; }
 .construction-overlay .point-node.derived-point > .point-visual,
-.construction-overlay .point-node.intersection-point > .point-visual { opacity: .12; stroke-width: 1.1; }
+.construction-overlay .point-node.intersection-point > .point-visual { opacity: 0; stroke-width: 0; }
+.construction-overlay .point-node.derived-point .point-hover-ring,
+.construction-overlay .point-node.intersection-point .point-hover-ring { opacity: 0 !important; }
 .construction-overlay .point-node > .point-visual { opacity: .12; stroke-width: 1.1; }
 .live-badge[data-state="idle"] { color: var(--ink-faint); }
 .construction-overlay .geometry-line,

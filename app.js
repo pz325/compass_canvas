@@ -231,6 +231,25 @@ function pointNear(a, b, tolerance = 0.01) {
   return distance(a, b) <= tolerance;
 }
 
+function distanceToSegment(point, a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const lengthSquared = dx * dx + dy * dy;
+  if (lengthSquared < EPS) return distance(point, a);
+  const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSquared));
+  return distance(point, { x: a.x + t * dx, y: a.y + t * dy });
+}
+
+function pointOnEntity(point, entity, tolerance) {
+  if (entity.type === "line") return distanceToSegment(point, entity.p1, entity.p2) <= tolerance;
+  if (entity.type === "circle") return Math.abs(distance(point, entity.center) - entity.radius) <= tolerance;
+  if (entity.type === "arc") {
+    return Math.abs(distance(point, entity.center) - entity.radius) <= tolerance
+      && angleOnArc(angleOf(entity.center, point), entity);
+  }
+  return false;
+}
+
 function lineIntersection(a, b, c, d) {
   const r = { x: b.x - a.x, y: b.y - a.y };
   const s = { x: d.x - c.x, y: d.y - c.y };
@@ -335,12 +354,23 @@ function pointKinds() {
   const intersections = allIntersections();
   const points = allPoints();
   const derived = entityPoints();
+  const geometryTolerance = 6 / state.scale;
   const merged = [...points, ...intersections];
   const unique = uniquePoints(merged);
   return unique.map((point) => {
     const isIntersection = intersections.some((p) => pointNear(p, point, 0.02));
-    const isDerived = derived.some((p) => pointNear(p, point, 0.02));
-    return { point, isIntersection, isStandalone: !isIntersection && !isDerived };
+    const isArcCenter = state.entities.some((entity) => entity.type === "arc" && pointNear(entity.center, point, 0.02));
+    const isOnGeometry = derived.some((p) => pointNear(p, point, 0.02))
+      || state.entities.some((entity) => pointOnEntity(point, entity, geometryTolerance));
+    // An arc center is useful as an independent construction point. Keep it
+    // visible unless another drawn segment/arc actually passes through it.
+    const isVisibleArcCenter = isArcCenter
+      && !state.entities.some((entity) => pointOnEntity(point, entity, geometryTolerance));
+    return {
+      point,
+      isIntersection,
+      isStandalone: !isIntersection && (isVisibleArcCenter || !isOnGeometry),
+    };
   });
 }
 
@@ -824,7 +854,7 @@ function renderPoints() {
     const node = el("g", { class: `point-node ${pointKind} ${selected ? "selected-point" : ""}`, tabindex: "0" });
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: isIntersection ? 3.5 : 3, class: "point-visual" }));
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hover-ring" }));
-    if (isIntersection) node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 10, class: "point-hit-area" }));
+    if (!isStandalone) node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hit-area" }));
     const label = el("title", {}, isIntersection ? t("pointIntersectionTitle") : t("pointInteractiveTitle"));
     node.appendChild(label);
     node.addEventListener("pointerdown", (event) => event.stopPropagation());
