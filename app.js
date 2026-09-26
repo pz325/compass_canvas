@@ -18,30 +18,36 @@ const translations = {
     compassNote: "两点确定半径后，圆规会持续保持这个长度；切换直尺或重新定半径时，状态会同步更新。",
     canvasStats: "画布统计", objects: "个对象", completed: "已完成", points: "点", interactivePoints: "可交互点",
     selectionHelp: "点线可选中；选中辅助线后可加粗为最终结果", finalize: "加粗为最终结果", shortcuts: "快捷键",
-    "tool.select.title": "选择 / 添加点", "tool.select.desc": "点击画布创建可交互点", "tool.radius.title": "定半径", "tool.radius.desc": "依次点取两个点",
-    "tool.compass.title": "画弧 / 画圆", "tool.compass.desc": "圆心 → 起点 → 终点", "tool.line.title": "直尺：对齐两点", "tool.line.desc": "两点定向，再取线段端点", "tool.line.short": "对齐两点",
-    emptyTitle: "从一个点开始", emptyDesc: "选择左侧工具，然后在画布上点取位置", emptyHint: "<kbd>R</kbd> 定半径 <i></i> <kbd>C</kbd> 画弧 / 圆 <i></i> <kbd>L</kbd> 画直线",
+    "tool.select.title": "选择 / 添加点", "tool.select.desc": "点击画布创建可交互点", "tool.radius.title": "定半径画弧", "tool.radius.desc": "两点量半径，再选圆心和弧端点",
+    "tool.compass.title": "画弧 / 画圆", "tool.compass.desc": "圆心 → 起点 → 终点", "tool.line.title": "定向截取线段", "tool.line.desc": "两点定向，再取线段端点", "tool.line.short": "对齐两点",
+    "tool.lineQuick.title": "两点画直线", "tool.lineQuick.desc": "依次点击两个点", "tool.arcThreePoint.title": "三点画弧", "tool.arcThreePoint.desc": "圆心 → 起点 → 终点",
+    emptyTitle: "从一个点开始", emptyDesc: "选择左侧工具，然后在画布上点取位置", emptyHint: "<kbd>D</kbd> 两点画线 <i></i> <kbd>A</kbd> 三点画弧",
     stateIdle: "圆规待设定", stateSetting: "重新取半径", stateReady: "圆规已就绪", stateHeld: "圆规半径保持", stateRuler: "直尺作图中",
     stateIdleHint: "先用“定半径”点取两点，或直接输入半径。", stateSettingHint: "依次点击两个点，新的距离会替换当前半径。",
     stateReadyHint: "当前保持 {radius} px；点击圆心开始作图。", stateHeldHint: "当前半径 {radius} px，切换回圆规即可继续。", stateRulerHint: "圆规半径仍保持 {radius} px，切回画弧 / 圆即可继续。",
     liveIdle: "待设定", liveSetting: "设定中", liveReady: "已就绪", liveHeld: "保持中", liveRuler: "直尺中",
     statusInitial: "准备就绪：从左侧选择工具，或点击画布添加一个点。", statusSelect: "选择模式：点击空白处创建点，点击已有点可选中。", statusRadius: "设定半径：请依次点击两个点。",
-    statusLine: "直尺模式：请点击第一个对齐点。", statusCompassCircle: "整圆模式：请点击圆心。", statusCompassArc: "圆弧模式：请点击圆心。",
+    statusLine: "直尺模式：请点击第一个对齐点。", statusLineQuick: "两点直线模式：请点击第一个点。", statusCompassCircle: "整圆模式：请点击圆心。", statusCompassArc: "圆弧模式：请点击圆心。", statusArcThreePoint: "三点画弧：请点击圆心。",
     statusEntityDone: "{entity}已完成；交点已自动生成，可继续点取。", statusSelectedPoint: "已选中点 ({x}, {y})。可切换工具继续作图。",
     statusRadiusFirst: "已记录第一个点，请点击第二个点确定半径。", statusTooClose: "两点距离太近，请换两个不同的点。",
     statusRadiusAuto: "半径已设为 {radius} px。已自动切换到圆规作图，请点击圆心。", statusLineFirst: "已记录第一个对齐点，请点击第二个对齐点确定直线方向。",
-    statusLineNear: "两个对齐点太近，请换一个点确定方向。", statusLineDirection: "直线方向已确定，请在线上点击线段起点。",
+    statusLineNear: "两个对齐点太近，请换一个点确定方向。", statusLineQuickSecond: "已记录第一个点，请点击第二个点完成直线。", statusLineDirection: "直线方向已确定，请在线上点击线段起点。",
     statusLineStart: "已记录线段起点，请在线上点击线段终点。", statusLineTooClose: "线段起点和终点太近，请在线上选择另一个点。",
     statusCircleCenter: "已记录圆心，点击画布完成整圆。", statusArcCenter: "已记录圆心，请点击圆周上的起点。", statusArcSame: "起点不能和圆心重合，请点在圆周方向上。",
-    statusArcStart: "已记录弧起点，请点击圆周上的结束方向。", statusArcTooClose: "起点和终点方向太近，请点击另一个方向。",
+    statusArcStart: "已记录弧起点，请点击圆周上的结束方向。", statusArcThreeStart: "已记录圆心和弧起点，请点击弧终点。", statusArcTooClose: "起点和终点方向太近，请点击另一个方向。",
     statusEntityFinal: "已选中最终结果。", statusEntityAux: "已选中辅助线段，可点击右侧按钮加粗为最终结果。", statusNoUndo: "没有可撤销的步骤。",
     statusUndo: "已撤销上一步作图。", statusClear: "画布已清空。", statusFinalized: "已将选中的辅助线段 / 弧线段加粗为最终结果。",
     statusRadiusMin: "半径至少为 10 px。", statusRadiusApplied: "半径已设为 {radius} px。", statusCanceled: "已取消当前操作，临时点也已移除。",
     entityLine: "直线段", entityCircle: "圆", entityArc: "圆弧", modeCircle: "整圆模式：请点击圆心。", modeArc: "圆弧模式：请点击圆心。",
     selectedFinal: "已是最终结果", arcCircle: "整圆", arcDraw: "画弧", pointIntersectionTitle: "交点 · 可继续点取", pointInteractiveTitle: "可交互点",
     helperSelect: "点击任意位置创建点；点击金色交点或端点可继续用于后续作图。", helperRadius: "依次点击两个点，以两点距离作为圆规半径。也可以在左侧输入框直接设定。",
-    helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。", helperCompassArc: "依次点击圆心、圆周上的起点和终点，按当前半径画出对应圆弧。", helperCompassCircle: "点击圆心即可画出整圆；使用右侧切换按钮可改为画弧。",
+    helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。", helperCompassArc: "依次点击圆心、圆周上的起点和终点，按当前半径画出对应圆弧。", helperCompassCircle: "点击圆心，再点击确认整圆；使用右侧切换按钮可改为画弧。", helperLineQuick: "依次点击两个点，立即画出经过这两个点的线段。", helperArcThreePoint: "依次点击圆心、弧起点和弧终点；半径由圆心到起点的距离决定。",
     noCompassRadius: "尚未设定圆规半径。", languageToggle: "切换语言", selectedAux: "已选中辅助对象", selectedPoint: "已选点 ({x}, {y})",
+    toolGroupLines: "直线", toolGroupArcs: "圆弧", reuseRadius: "使用当前半径（C）", reuseRadiusShortcut: "使用当前半径",
+    statusArcThreeCenter: "已记录圆心，请点击弧起点，同时确定半径。",
+    stateQuickArc: "三点画弧中", stateQuickArcHint: "第二点确定本次圆弧半径；终点吸附到该圆周。",
+    stateQuickArcRadiusHint: "本次圆弧半径 {radius} px；请选择圆周上的终点。",
+    heldRadius: "保留的圆规半径", quickArcRadius: "本次圆弧半径",
     editActions: "编辑操作", workspace: "尺规作图工作区", toolRail: "作图工具", toolToolbar: "选择作图工具", canvasSurface: "几何作图画布", canvasBoard: "尺规作图画布", inspector: "作图信息", radiusSlider: "半径滑块",
   },
   en: {
@@ -51,33 +57,39 @@ const translations = {
     untitled: "Untitled construction", newDoc: "/ New", zoomOut: "Zoom out", zoomIn: "Zoom in", resetView: "Reset view", noSelection: "No selection",
     wheelZoom: "<kbd>Wheel</kbd> zoom", spacePan: "<kbd>Space</kbd> + drag to pan", snapHint: "Intersections snap automatically · every point can be reused",
     compassStatus: "Compass status", currentRadius: "Current radius", freeRadius: "Set freely", apply: "Apply", currentMode: "Mode: ", switch: "Switch ↔",
-    compassNote: "Once set, the compass keeps this radius until you choose a new radius or switch tools.",
+    compassNote: "The compass keeps this radius across tools. Choose Transfer radius & arc to measure again, or reuse the held radius.",
     canvasStats: "Canvas stats", objects: "objects", completed: "completed", points: "points", interactivePoints: "interactive",
     selectionHelp: "Select a line or arc; confirm an auxiliary guide as a final result", finalize: "Make final result", shortcuts: "Shortcuts",
-    "tool.select.title": "Select / add point", "tool.select.desc": "Click the canvas to create a point", "tool.radius.title": "Set radius", "tool.radius.desc": "Pick two points in order",
-    "tool.compass.title": "Draw arc / circle", "tool.compass.desc": "Center → start → end", "tool.line.title": "Straightedge: align points", "tool.line.desc": "Set direction, then choose segment ends", "tool.line.short": "Align two points",
-    emptyTitle: "Start with a point", emptyDesc: "Choose a tool, then click on the canvas", emptyHint: "<kbd>R</kbd> set radius <i></i> <kbd>C</kbd> draw arc / circle <i></i> <kbd>L</kbd> draw line",
+    "tool.select.title": "Select / add point", "tool.select.desc": "Click the canvas to create a point", "tool.radius.title": "Transfer radius & arc", "tool.radius.desc": "Measure two points, then center & ends",
+    "tool.compass.title": "Draw arc / circle", "tool.compass.desc": "Center → start → end", "tool.line.title": "Align & trim a line", "tool.line.desc": "Set direction, then choose segment ends", "tool.line.short": "Align two points",
+    "tool.lineQuick.title": "Two-point line", "tool.lineQuick.desc": "Click two points in order", "tool.arcThreePoint.title": "Center–start–end arc", "tool.arcThreePoint.desc": "Center → start → end",
+    emptyTitle: "Start with a point", emptyDesc: "Choose a tool, then click on the canvas", emptyHint: "<kbd>D</kbd> two-point line <i></i> <kbd>A</kbd> center–start–end arc",
     stateIdle: "Compass not set", stateSetting: "Choosing a new radius", stateReady: "Compass ready", stateHeld: "Compass radius held", stateRuler: "Straightedge active",
     stateIdleHint: "Set a radius with two points or enter a value directly.", stateSettingHint: "Pick two points; their distance will replace the current radius.",
     stateReadyHint: "Holding {radius} px; click a center to begin.", stateHeldHint: "Current radius: {radius} px. Switch back to the compass to continue.", stateRulerHint: "The compass keeps {radius} px. Switch back to draw an arc or circle.",
     liveIdle: "Not set", liveSetting: "Setting", liveReady: "Ready", liveHeld: "Held", liveRuler: "Ruler",
     statusInitial: "Ready: choose a tool or click the canvas to add a point.", statusSelect: "Select mode: click empty space to add a point, or click an existing point.", statusRadius: "Radius mode: click two points in order.",
-    statusLine: "Straightedge mode: click the first alignment point.", statusCompassCircle: "Circle mode: click the center.", statusCompassArc: "Arc mode: click the center.",
+    statusLine: "Straightedge mode: click the first alignment point.", statusLineQuick: "Two-point line mode: click the first point.", statusCompassCircle: "Circle mode: click the center.", statusCompassArc: "Arc mode: click the center.", statusArcThreePoint: "Three-point arc: click the center.",
     statusEntityDone: "{entity} completed; intersections are ready to reuse.", statusSelectedPoint: "Selected point ({x}, {y}). Switch tools to continue.",
     statusRadiusFirst: "First point recorded. Click the second point to set the radius.", statusTooClose: "Those points are too close. Choose two different points.",
     statusRadiusAuto: "Radius set to {radius} px. Switched to compass drawing; click a center.", statusLineFirst: "First alignment point recorded. Click the second point to set the direction.",
-    statusLineNear: "Those alignment points are too close. Choose another point.", statusLineDirection: "Direction set. Click the segment start on the guide line.",
+    statusLineNear: "Those alignment points are too close. Choose another point.", statusLineQuickSecond: "First point recorded. Click the second point to draw the line.", statusLineDirection: "Direction set. Click the segment start on the guide line.",
     statusLineStart: "Segment start recorded. Click the segment end on the guide line.", statusLineTooClose: "The segment is too short. Choose another point on the guide line.",
     statusCircleCenter: "Center recorded. Click the canvas to complete the circle.", statusArcCenter: "Center recorded. Click the start direction on the circle.", statusArcSame: "The start cannot overlap the center. Click toward the circle.",
-    statusArcStart: "Arc start recorded. Click the end direction on the circle.", statusArcTooClose: "Start and end directions are too close. Choose another direction.",
+    statusArcStart: "Arc start recorded. Click the end direction on the circle.", statusArcThreeStart: "Center and arc start recorded. Click the arc end.", statusArcTooClose: "Start and end directions are too close. Choose another direction.",
     statusEntityFinal: "Final result selected.", statusEntityAux: "Auxiliary guide selected. Use the button to make it final.", statusNoUndo: "There is nothing to undo.",
     statusUndo: "Last construction undone.", statusClear: "Canvas cleared.", statusFinalized: "Selected guide is now a final result.",
     statusRadiusMin: "Radius must be at least 10 px.", statusRadiusApplied: "Radius set to {radius} px.", statusCanceled: "Current operation canceled; temporary points were removed.",
     entityLine: "Segment", entityCircle: "Circle", entityArc: "Arc", modeCircle: "Circle mode: click the center.", modeArc: "Arc mode: click the center.",
     selectedFinal: "Already final", arcCircle: "Circle", arcDraw: "Draw arc", pointIntersectionTitle: "Intersection · ready to reuse", pointInteractiveTitle: "Interactive point",
     helperSelect: "Click anywhere to create a point; click a highlighted intersection or endpoint to reuse it.", helperRadius: "Pick two points in order to use their distance as the compass radius, or enter a value on the left.",
-    helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.", helperCompassArc: "Click the center, then the start and end points on the circle to draw the arc at the current radius.", helperCompassCircle: "Click the center to draw a full circle. Use the switch button to draw an arc instead.",
+    helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.", helperCompassArc: "Click the center, then the start and end points on the circle to draw the arc at the current radius.", helperCompassCircle: "Click the center, then click again to confirm a full circle. Use the switch to draw an arc.", helperLineQuick: "Click two points in order to immediately draw the segment between them.", helperArcThreePoint: "Click the center, arc start, and arc end; the radius comes from the center to the start.",
     noCompassRadius: "The compass radius is not set.", languageToggle: "Switch language", selectedAux: "Auxiliary object selected", selectedPoint: "Point selected ({x}, {y})",
+    toolGroupLines: "Lines", toolGroupArcs: "Arcs", reuseRadius: "Use held radius (C)", reuseRadiusShortcut: "Use held radius",
+    statusArcThreeCenter: "Center recorded. Click the arc start to set its radius.",
+    stateQuickArc: "Center–start–end arc", stateQuickArcHint: "The second point sets this arc’s radius; the end snaps to that circle.",
+    stateQuickArcRadiusHint: "Arc radius: {radius} px. Choose the end on the circle.",
+    heldRadius: "Held compass radius", quickArcRadius: "This arc’s radius",
     editActions: "Edit actions", workspace: "Straightedge and compass workspace", toolRail: "Construction tools", toolToolbar: "Choose a construction tool", canvasSurface: "Geometry construction canvas", canvasBoard: "Straightedge and compass canvas", inspector: "Construction details", radiusSlider: "Radius slider",
   },
 };
@@ -124,6 +136,7 @@ const finalizeBtn = document.querySelector("#finalizeBtn");
 const state = {
   language: initialLanguage,
   mode: "select",
+  status: { key: "statusInitial", vars: {} },
   arcMode: "arc",
   radius: 150,
   radiusReady: false,
@@ -163,8 +176,16 @@ const toolCopy = {
     helperKey: "helperLine",
   },
   compass: {
-    titleKey: "tool.compass.title",
+    titleKey: "tool.radius.title",
     helperKey: "helperCompass",
+  },
+  lineQuick: {
+    titleKey: "tool.lineQuick.title",
+    helperKey: "helperLineQuick",
+  },
+  arcThreePoint: {
+    titleKey: "tool.arcThreePoint.title",
+    helperKey: "helperArcThreePoint",
   },
 };
 
@@ -445,23 +466,47 @@ function refreshDynamicLabels() {
   updateToolCopy();
   syncRadiusControls();
   render();
+  updateStatus();
 }
 
-function setStatus(text) {
-  statusLine.textContent = text;
+function setStatus(key, vars = {}) {
+  state.status = { key, vars };
+  updateStatus();
+}
+
+function updateStatus() {
+  const { key, vars } = state.status;
+  statusLine.textContent = t(key, vars.entityKey ? { ...vars, entity: t(vars.entityKey) } : vars);
+}
+
+function currentStep() {
+  const n = state.pending.length;
+  if (state.mode === "lineQuick") return { key: n ? "statusLineQuickSecond" : "statusLineQuick", number: n + 1, total: 2 };
+  if (state.mode === "arcThreePoint") return { key: ["statusArcThreePoint", "statusArcThreeCenter", "statusArcThreeStart"][n], number: n + 1, total: 3 };
+  if (state.mode === "line") return { key: ["statusLine", "statusLineFirst", "statusLineDirection", "statusLineStart"][n], number: n + 1, total: 4 };
+  if (state.mode === "radius") return { key: n ? "statusRadiusFirst" : "statusRadius", number: n + 1, total: state.arcMode === "circle" ? 4 : 5 };
+  if (state.mode === "compass") {
+    const keys = state.arcMode === "circle" ? ["statusCompassCircle", "statusCircleCenter"] : ["statusCompassArc", "statusArcCenter", "statusArcStart"];
+    return { key: keys[n], number: n + 3, total: state.arcMode === "circle" ? 4 : 5 };
+  }
+  return { key: "helperSelect", number: 1, total: 1 };
 }
 
 function updateToolCopy() {
   const copy = toolCopy[state.mode];
   if (!copy) return;
-  const helperKey = state.mode === "compass"
-    ? (state.arcMode === "circle" ? "helperCompassCircle" : "helperCompassArc")
-    : copy.helperKey;
-  helperLine.textContent = t(helperKey);
+  const step = currentStep();
+  helperLine.textContent = t(step.key);
+  document.querySelector("#stepNumber").textContent = `${step.number}/${step.total}`;
   document.querySelector("#toolTitle").textContent = t(copy.titleKey);
-  document.querySelectorAll("[data-mode]").forEach((button) => button.classList.toggle("active", button.dataset.mode === state.mode));
+  document.querySelectorAll("[data-mode]").forEach((button) => {
+    const active = button.dataset.mode === (state.mode === "compass" ? "radius" : state.mode);
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
   document.querySelector("#arcModeToggle").classList.toggle("active", state.arcMode === "circle");
   document.querySelector("#arcModeLabel").textContent = t(state.arcMode === "circle" ? "arcCircle" : "arcDraw");
+  document.querySelector("#arcModeToggle").disabled = state.mode === "arcThreePoint";
   updateCompassStateUI();
 }
 
@@ -471,12 +516,19 @@ function updateCompassStateUI() {
   let label = t("stateIdle");
   let hint = t("stateIdleHint");
   let live = t("liveIdle");
-  if (state.mode === "radius" && state.radiusPicking) {
+  if (state.mode === "arcThreePoint") {
+    cardState = state.pending.length === 2 ? "ready" : "setting";
+    label = t("stateQuickArc");
+    hint = state.pending.length === 2
+      ? t("stateQuickArcRadiusHint", { radius: Math.round(distance(state.pending[0], state.pending[1]) * 10) / 10 })
+      : t("stateQuickArcHint");
+    live = t(state.pending.length === 2 ? "liveReady" : "liveSetting");
+  } else if (state.mode === "radius" && state.radiusPicking) {
     cardState = "setting";
     label = t("stateSetting");
     hint = t("stateSettingHint");
     live = t("liveSetting");
-  } else if (state.mode === "line") {
+  } else if (state.mode === "line" || state.mode === "lineQuick") {
     cardState = state.radiusReady ? "held" : "idle";
     label = t("stateRuler");
     hint = state.radiusReady ? t("stateRulerHint", { radius: Math.round(state.radius) }) : t("noCompassRadius");
@@ -497,7 +549,10 @@ function updateCompassStateUI() {
 function syncRadiusControls() {
   radiusInput.value = Math.round(state.radius * 10) / 10;
   radiusSlider.value = Math.max(20, Math.min(300, state.radius));
-  document.querySelector("#radiusReadout").textContent = `${Math.round(state.radius)} px`;
+  const quickRadius = state.mode === "arcThreePoint" && state.pending.length === 2
+    ? distance(state.pending[0], state.pending[1]) : null;
+  document.querySelector("#radiusReadout").textContent = `${Math.round((quickRadius ?? state.radius) * 10) / 10} px`;
+  document.querySelector(".radius-unit").textContent = t(quickRadius !== null ? "quickArcRadius" : state.mode === "arcThreePoint" ? "heldRadius" : "currentRadius");
   updateCompassStateUI();
 }
 
@@ -533,6 +588,9 @@ function getSnap(point) {
 }
 
 function setMode(mode) {
+  // Keep intentionally added standalone points; discard incomplete geometry.
+  if (state.mode !== "select") clearOperationPoints();
+  if (mode === "radius") state.arcMode = "arc";
   state.mode = mode;
   state.radiusPicking = mode === "radius";
   state.pending = [];
@@ -543,17 +601,13 @@ function setMode(mode) {
   state.operationPoints = [];
   updateToolCopy();
   render();
-  const messages = {
-    select: t("statusSelect"),
-    radius: t("statusRadius"),
-    line: t("statusLine"),
-    compass: t(state.arcMode === "circle" ? "statusCompassCircle" : "statusCompassArc"),
-  };
-  setStatus(messages[mode]);
+  setStatus(currentStep().key);
 }
 
 function pushHistory() {
-  state.history.push({ entities: JSON.parse(JSON.stringify(state.entities)), freePoints: JSON.parse(JSON.stringify(state.freePoints)), radius: state.radius, radiusReady: state.radiusReady });
+  const committedPoints = state.mode === "select" ? state.freePoints
+    : state.freePoints.filter((point) => !state.operationPoints.some((temporary) => pointNear(point, temporary, 0.01)));
+  state.history.push({ entities: JSON.parse(JSON.stringify(state.entities)), freePoints: JSON.parse(JSON.stringify(committedPoints)), radius: state.radius, radiusReady: state.radiusReady });
   if (state.history.length > 30) state.history.shift();
 }
 
@@ -567,14 +621,14 @@ function commitEntity(entity) {
   state.operationPoints = [];
   render();
   const entityKey = entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc";
-  setStatus(t("statusEntityDone", { entity: t(entityKey) }));
+  setStatus("statusEntityDone", { entityKey });
 }
 
-function pointOnRadius(center, clickPoint) {
+function pointOnRadius(center, clickPoint, radius = state.radius) {
   const vector = { x: clickPoint.x - center.x, y: clickPoint.y - center.y };
   const len = Math.hypot(vector.x, vector.y);
   if (len < EPS) return null;
-  return { x: center.x + (vector.x / len) * state.radius, y: center.y + (vector.y / len) * state.radius };
+  return { x: center.x + (vector.x / len) * radius, y: center.y + (vector.y / len) * radius };
 }
 
 function makeLineGuide(a, b) {
@@ -607,7 +661,7 @@ function lineGuidePoint(rawPoint) {
   let best = tolerance;
   for (const item of pointKinds()) {
     const onGuide = projectToLine(item.point, state.lineGuide);
-    if (distance(item.point, onGuide) > tolerance) continue;
+    if (distance(item.point, onGuide) > 1e-5) continue;
     const d = distance(projected, item.point);
     if (d < best) {
       best = d;
@@ -619,12 +673,14 @@ function lineGuidePoint(rawPoint) {
 
 function handleCanvasClick(rawPoint) {
   let point = getSnap(rawPoint);
+  state.previewPoint = point;
+  state.pointer = { ...rawPoint, inside: true };
   if (state.mode === "select") {
     addOperationPoint(point);
     state.selectedPoint = point;
     state.selectedEntity = null;
     render();
-    setStatus(t("statusSelectedPoint", { x: Math.round(point.x), y: Math.round(point.y) }));
+    setStatus("statusSelectedPoint", { x: Math.round(point.x), y: Math.round(point.y) });
     return;
   }
 
@@ -632,20 +688,18 @@ function handleCanvasClick(rawPoint) {
     if (state.pending.length === 0) {
       state.pending = [point];
       addOperationPoint(point);
-      setStatus(t("statusRadiusFirst"));
+      setStatus("statusRadiusFirst");
     } else {
       const first = state.pending[0];
       const radius = distance(first, point);
       if (radius < 4) {
-        setStatus(t("statusTooClose"));
+        setStatus("statusTooClose");
         return;
       }
       pushHistory();
       state.radius = radius;
       state.radiusReady = true;
-      state.radiusPicking = false;
       addOperationPoint(point);
-      state.pending = [];
       state.mode = "compass";
       state.radiusPicking = false;
       state.pending = [];
@@ -653,7 +707,7 @@ function handleCanvasClick(rawPoint) {
       state.operationPoints = [];
       updateToolCopy();
       syncRadiusControls();
-      setStatus(t("statusRadiusAuto", { radius: Math.round(radius * 10) / 10 }));
+      setStatus("statusRadiusAuto", { radius: Math.round(radius * 10) / 10 });
     }
     render();
     return;
@@ -663,27 +717,27 @@ function handleCanvasClick(rawPoint) {
     if (state.pending.length === 0) {
       state.pending = [point];
       addOperationPoint(point);
-      setStatus(t("statusLineFirst"));
+      setStatus("statusLineFirst");
     } else if (!state.lineGuide) {
       const first = state.pending[0];
       if (distance(first, point) < 4) {
-        setStatus(t("statusLineNear"));
+        setStatus("statusLineNear");
         return;
       }
       addOperationPoint(point);
       state.pending.push(point);
       state.lineGuide = makeLineGuide(first, point);
-      setStatus(t("statusLineDirection"));
+      setStatus("statusLineDirection");
     } else if (state.pending.length === 2) {
       const start = lineGuidePoint(rawPoint);
       state.pending.push(start);
       addOperationPoint(start);
-      setStatus(t("statusLineStart"));
+      setStatus("statusLineStart");
     } else {
       const start = state.pending[2];
       const end = lineGuidePoint(rawPoint);
       if (distance(start, end) < 4) {
-        setStatus(t("statusLineTooClose"));
+        setStatus("statusLineTooClose");
         return;
       }
       addOperationPoint(end);
@@ -693,23 +747,79 @@ function handleCanvasClick(rawPoint) {
     return;
   }
 
+  if (state.mode === "lineQuick") {
+    if (state.pending.length === 0) {
+      state.pending = [point];
+      addOperationPoint(point);
+      setStatus("statusLineQuickSecond");
+    } else {
+      const first = state.pending[0];
+      if (distance(first, point) < 4) {
+        setStatus("statusLineTooClose");
+        return;
+      }
+      addOperationPoint(point);
+      commitEntity({ type: "line", p1: clonePoint(first), p2: clonePoint(point) });
+    }
+    render();
+    return;
+  }
+
+  if (state.mode === "arcThreePoint") {
+    if (state.pending.length === 0) {
+      state.pending = [point];
+      addOperationPoint(point);
+      setStatus("statusArcThreeCenter");
+    } else if (state.pending.length === 1) {
+      const center = state.pending[0];
+      const radius = distance(center, point);
+      if (radius < 4) {
+        setStatus("statusArcSame");
+        return;
+      }
+      state.pending.push(point);
+      addOperationPoint(point);
+      setStatus("statusArcThreeStart");
+    } else {
+      const center = state.pending[0];
+      const start = state.pending[1];
+      const radius = distance(center, start);
+      const end = pointOnRadius(center, point, radius);
+      if (!end) {
+        setStatus("statusArcSame");
+        return;
+      }
+      const a0 = angleOf(center, start);
+      const a1 = angleOf(center, end);
+      if (Math.min(normalizeAngle(a1 - a0), normalizeAngle(a0 - a1)) < 0.02) {
+        setStatus("statusArcTooClose");
+        return;
+      }
+      const sweep = normalizeAngle(a1 - a0) <= Math.PI ? 1 : 0;
+      addOperationPoint(end);
+      commitEntity({ type: "arc", center: clonePoint(center), radius, start: clonePoint(start), end: clonePoint(end), a0, a1, sweep });
+    }
+    render();
+    return;
+  }
+
   if (state.mode === "compass") {
     if (state.pending.length === 0) {
       state.pending = [point];
       addOperationPoint(point);
-      setStatus(t(state.arcMode === "circle" ? "statusCircleCenter" : "statusArcCenter"));
+      setStatus(state.arcMode === "circle" ? "statusCircleCenter" : "statusArcCenter");
     } else if (state.arcMode === "circle") {
       const center = state.pending[0];
       commitEntity({ type: "circle", center: clonePoint(center), radius: state.radius });
     } else if (state.pending.length === 1) {
       const start = pointOnRadius(state.pending[0], point);
       if (!start) {
-        setStatus(t("statusArcSame"));
+        setStatus("statusArcSame");
         return;
       }
       state.pending.push(start);
       addOperationPoint(start);
-      setStatus(t("statusArcStart"));
+      setStatus("statusArcStart");
     } else {
       const center = state.pending[0];
       const start = state.pending[1];
@@ -718,8 +828,8 @@ function handleCanvasClick(rawPoint) {
       const a0 = angleOf(center, start);
       const a1 = angleOf(center, end);
       const sweep = normalizeAngle(a1 - a0) <= Math.PI ? 1 : 0;
-      if (Math.abs(normalizeAngle(a1 - a0)) < 0.02) {
-        setStatus(t("statusArcTooClose"));
+      if (Math.min(normalizeAngle(a1 - a0), normalizeAngle(a0 - a1)) < 0.02) {
+        setStatus("statusArcTooClose");
         return;
       }
       addOperationPoint(end);
@@ -746,7 +856,7 @@ function bindEntityInteraction(node, entity) {
     state.selectedEntity = entity;
     state.selectedPoint = null;
     render();
-    setStatus(t(entity.final ? "statusEntityFinal" : "statusEntityAux"));
+    setStatus(entity.final ? "statusEntityFinal" : "statusEntityAux");
   });
 }
 
@@ -787,6 +897,29 @@ function renderArc(entity, layer) {
 function renderPreview() {
   referenceLayer.replaceChildren();
   const pending = state.pending;
+  if (state.mode === "lineQuick") {
+    if (state.pointer.inside && state.previewPoint && pending.length === 1) {
+      referenceLayer.appendChild(el("line", {
+        x1: pending[0].x,
+        y1: pending[0].y,
+        x2: state.previewPoint.x,
+        y2: state.previewPoint.y,
+        class: "reference-line ruler-direction-preview",
+      }));
+    }
+    return;
+  }
+  if (state.mode === "arcThreePoint" && pending.length) {
+    const center = pending[0];
+    const cursor = state.pointer.inside ? state.previewPoint : null;
+    if (pending.length === 1 && cursor) {
+      const radius = distance(center, cursor);
+      if (radius >= 4) renderCircularPreview(center, radius, null, cursor);
+    } else if (pending.length === 2) {
+      renderCircularPreview(center, distance(center, pending[1]), pending[1], cursor);
+    }
+    return;
+  }
   if (state.mode === "line") {
     if (state.lineGuide) {
       // Keep the supporting line visible after the two alignment points have
@@ -825,24 +958,28 @@ function renderPreview() {
     }
     return;
   }
-  if (!state.pointer.inside || !state.previewPoint) return;
-  const cursor = state.previewPoint;
-  if (state.mode === "radius" && pending.length === 1) {
+  const cursor = state.pointer.inside ? state.previewPoint : null;
+  if (state.mode === "radius" && pending.length === 1 && cursor) {
     referenceLayer.appendChild(el("line", { x1: pending[0].x, y1: pending[0].y, x2: cursor.x, y2: cursor.y, class: "reference-line" }));
-    const distanceText = `${Math.round(distance(pending[0], cursor))} px`;
-    referenceLayer.appendChild(el("text", { x: cursor.x + 12, y: cursor.y - 12, class: "reference-label" }, distanceText));
+    referenceLayer.appendChild(el("text", { x: cursor.x + 12, y: cursor.y - 12, class: "reference-label" }, `${Math.round(distance(pending[0], cursor))} px`));
   }
   if (state.mode === "compass" && pending.length >= 1) {
-    const center = pending[0];
-    referenceLayer.appendChild(el("circle", { cx: center.x, cy: center.y, r: state.radius, class: "reference-circle" }));
-    referenceLayer.appendChild(el("line", { x1: center.x, y1: center.y, x2: cursor.x, y2: cursor.y, class: "reference-line" }));
-    if (state.arcMode === "arc" && pending.length === 2) {
-      const end = pointOnRadius(center, cursor);
-      if (end) {
-        const preview = { center, radius: state.radius, a0: angleOf(center, pending[1]), a1: angleOf(center, end), sweep: normalizeAngle(angleOf(center, end) - angleOf(center, pending[1])) <= Math.PI ? 1 : 0 };
-        referenceLayer.appendChild(el("path", { d: arcPath(preview), class: "reference-arc" }));
-      }
-    }
+    renderCircularPreview(pending[0], state.radius, state.arcMode === "arc" ? pending[1] : null, cursor);
+  }
+}
+
+function renderCircularPreview(center, radius, start, cursor) {
+  referenceLayer.appendChild(el("circle", { cx: center.x, cy: center.y, r: radius, class: "reference-circle" }));
+  if (start) referenceLayer.appendChild(el("circle", { cx: start.x, cy: start.y, r: 6, class: "reference-point" }));
+  const end = cursor && pointOnRadius(center, cursor, radius);
+  if (!end) return;
+  referenceLayer.appendChild(el("line", { x1: center.x, y1: center.y, x2: end.x, y2: end.y, class: "reference-line" }));
+  referenceLayer.appendChild(el("circle", { cx: end.x, cy: end.y, r: 7, class: "reference-point" }));
+  if (start) {
+    const a0 = angleOf(center, start);
+    const a1 = angleOf(center, end);
+    const preview = { center, radius, a0, a1, sweep: normalizeAngle(a1 - a0) <= Math.PI ? 1 : 0 };
+    referenceLayer.appendChild(el("path", { d: arcPath(preview), class: "reference-arc" }));
   }
 }
 
@@ -869,6 +1006,8 @@ function renderPoints() {
 }
 
 function render() {
+  updateToolCopy();
+  syncRadiusControls();
   geometryLayer.replaceChildren();
   for (const entity of state.entities) {
     if (entity.type === "line") renderLine(entity, geometryLayer);
@@ -901,7 +1040,7 @@ function resetView() {
 function undo() {
   const previous = state.history.pop();
   if (!previous) {
-    setStatus(t("statusNoUndo"));
+    setStatus("statusNoUndo");
     return;
   }
   state.entities = previous.entities;
@@ -916,7 +1055,7 @@ function undo() {
   state.selectedEntity = null;
   syncRadiusControls();
   render();
-  setStatus(t("statusUndo"));
+  setStatus("statusUndo");
 }
 
 function clearBoard() {
@@ -930,7 +1069,7 @@ function clearBoard() {
   state.selectedEntity = null;
   state.operationPoints = [];
   render();
-  setStatus(t("statusClear"));
+  setStatus("statusClear");
 }
 
 function finalizeSelectedEntity() {
@@ -938,43 +1077,44 @@ function finalizeSelectedEntity() {
   pushHistory();
   state.selectedEntity.final = true;
   render();
-  setStatus(t("statusFinalized"));
+  setStatus("statusFinalized");
 }
 
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
+document.querySelector("#reuseRadiusBtn").addEventListener("click", () => setMode("compass"));
 if (languageToggle) languageToggle.addEventListener("click", () => {
   state.language = state.language === "zh" ? "en" : "zh";
   try { localStorage.setItem(LANG_KEY, state.language); } catch (_) { /* storage may be unavailable for file URLs */ }
   applyLanguage();
-  const messageKey = state.mode === "radius" ? "statusRadius" : state.mode === "line" ? "statusLine" : state.mode === "compass" ? (state.arcMode === "circle" ? "statusCompassCircle" : "statusCompassArc") : "statusSelect";
-  setStatus(t(messageKey));
 });
 document.querySelector("#arcModeToggle").addEventListener("click", () => {
+  if (state.mode === "arcThreePoint") return;
+  if (state.mode !== "select") clearOperationPoints();
   state.arcMode = state.arcMode === "arc" ? "circle" : "arc";
   state.pending = [];
   state.lineGuide = null;
-  updateToolCopy();
-  render();
-  setStatus(t(state.arcMode === "circle" ? "statusCompassCircle" : "statusCompassArc"));
+  setMode("compass");
 });
 document.querySelector("#applyRadius").addEventListener("click", () => {
   const value = Number(radiusInput.value);
   if (!Number.isFinite(value) || value < 10) {
-    setStatus(t("statusRadiusMin"));
+    setStatus("statusRadiusMin");
     return;
   }
   pushHistory();
+  if (state.mode !== "select") clearOperationPoints();
   state.radius = Math.min(1000, value);
   state.radiusReady = true;
   state.radiusPicking = false;
-  syncRadiusControls();
-  setStatus(t("statusRadiusApplied", { radius: Math.round(state.radius * 10) / 10 }));
+  setMode("compass");
+  setStatus("statusRadiusApplied", { radius: Math.round(state.radius * 10) / 10 });
 });
 radiusSlider.addEventListener("input", () => {
+  if (state.mode !== "select") clearOperationPoints();
   state.radius = Number(radiusSlider.value);
   state.radiusReady = true;
   state.radiusPicking = false;
-  syncRadiusControls();
+  setMode("compass");
 });
 document.querySelector("#undoBtn").addEventListener("click", undo);
 document.querySelector("#clearBtn").addEventListener("click", clearBoard);
@@ -1027,10 +1167,9 @@ board.addEventListener("pointerdown", (event) => {
 });
 board.addEventListener("pointerup", (event) => {
   if (state.isPanning) {
-    const wasMoved = state.panMoved;
     state.isPanning = false;
     try { board.releasePointerCapture(event.pointerId); } catch (_) { /* already released */ }
-    if (wasMoved || event.button !== 0 || event.shiftKey) return;
+    return;
   }
   if (event.button === 0) {
     handleCanvasClick(eventToWorld(event));
@@ -1068,10 +1207,10 @@ document.addEventListener("keydown", (event) => {
     state.selectedPoint = null;
     state.selectedEntity = null;
     render();
-    setStatus(t("statusCanceled"));
+    setStatus("statusCanceled");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
-    const shortcut = { v: "select", r: "radius", c: "compass", l: "line" }[event.key.toLowerCase()];
+    const shortcut = { v: "select", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint" }[event.key.toLowerCase()];
     if (shortcut && event.target.tagName !== "INPUT") setMode(shortcut);
   }
 });
@@ -1083,5 +1222,5 @@ document.addEventListener("keyup", (event) => {
 });
 
 applyLanguage();
-setStatus(t("statusInitial"));
+setStatus("statusInitial");
 render();

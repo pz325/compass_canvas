@@ -17,28 +17,39 @@
         <div class="brand-mark" aria-hidden="true"><span class="brand-mark-ring"></span><span class="brand-mark-line"></span><span class="brand-mark-dot"></span></div>
         <div><h1>CompassCanvas</h1><p data-i18n="brand.subtitle">尺规作图工作台</p></div>
       </div>
-      <div class="header-actions" aria-label="编辑操作">
-        <button class="button button-ghost button-compact language-toggle" id="languageToggle" type="button" aria-label="切换语言" data-i18n-title="languageToggle">EN</button>
-        <button class="icon-button" id="undoBtn" type="button" title="撤销（⌘/Ctrl Z）" aria-label="撤销" data-i18n-title="undo">↶</button>
+      <div class="header-actions" aria-label="编辑操作" data-i18n-aria="editActions">
+        <button class="button button-ghost button-compact language-toggle" id="languageToggle" type="button" aria-label="切换语言" data-i18n-title="languageToggle" data-i18n-aria="languageToggle">EN</button>
+        <button class="icon-button" id="undoBtn" type="button" title="撤销（⌘/Ctrl Z）" aria-label="撤销" data-i18n-title="undo" data-i18n-aria="undo">↶</button>
         <button class="button button-ghost button-compact" id="clearBtn" type="button" data-i18n="clear">清空画布</button>
       </div>
     </header>
 
-    <section class="workspace" aria-label="尺规作图工作区">
-      <aside class="tool-rail" aria-label="作图工具">
+    <section class="workspace" aria-label="尺规作图工作区" data-i18n-aria="workspace">
+      <aside class="tool-rail" aria-label="作图工具" data-i18n-aria="toolRail">
         <div class="rail-section rail-section-tools">
           <div class="section-kicker" data-i18n="tools">工具</div>
-          <div class="tool-list" role="toolbar" aria-label="选择作图工具">
+          <div class="tool-list" role="toolbar" aria-label="选择作图工具" data-i18n-aria="toolToolbar">
             <button class="tool-item" data-mode="select" type="button"><span class="tool-icon">⌁</span><span class="tool-copy"><strong data-i18n="tool.select.title">选择 / 添加点</strong><small data-i18n="tool.select.desc">点击画布创建可交互点</small></span><span class="tool-key">V</span></button>
-            <button class="tool-item" data-mode="radius" type="button"><span class="tool-icon">⊙</span><span class="tool-copy"><strong data-i18n="tool.radius.title">定半径</strong><small data-i18n="tool.radius.desc">依次点取两个点</small></span><span class="tool-key">R</span></button>
-            <button class="tool-item" data-mode="compass" type="button"><span class="tool-icon">◔</span><span class="tool-copy"><strong data-i18n="tool.compass.title">画弧 / 画圆</strong><small data-i18n="tool.compass.desc">圆心 → 起点 → 终点</small></span><span class="tool-key">C</span></button>
-            <button class="tool-item" data-mode="line" type="button"><span class="tool-icon">／</span><span class="tool-copy"><strong data-i18n="tool.line.title">直尺：对齐两点</strong><small data-i18n="tool.line.desc">两点定向，再取线段端点</small></span><span class="tool-key">L</span></button>
+            <div class="tool-group" role="group" aria-labelledby="lineToolsLabel">
+              <div class="tool-group-title" id="lineToolsLabel" data-i18n="toolGroupLines">直线</div>
+              <div class="tool-group-items">
+                <button class="tool-item" data-mode="lineQuick" type="button"><span class="tool-icon">↗</span><span class="tool-copy"><strong data-i18n="tool.lineQuick.title">两点画直线</strong><small data-i18n="tool.lineQuick.desc">依次点击起点、终点</small></span><span class="tool-key">D</span></button>
+                <button class="tool-item" data-mode="line" type="button"><span class="tool-icon">／</span><span class="tool-copy"><strong data-i18n="tool.line.title">定向截取线段</strong><small data-i18n="tool.line.desc">两点定向，再取线段端点</small></span><span class="tool-key">L</span></button>
+              </div>
+            </div>
+            <div class="tool-group" role="group" aria-labelledby="arcToolsLabel">
+              <div class="tool-group-title" id="arcToolsLabel" data-i18n="toolGroupArcs">圆弧</div>
+              <div class="tool-group-items">
+                <button class="tool-item" data-mode="arcThreePoint" type="button"><span class="tool-icon">⌒</span><span class="tool-copy"><strong data-i18n="tool.arcThreePoint.title">三点画弧</strong><small data-i18n="tool.arcThreePoint.desc">圆心 → 起点 → 终点</small></span><span class="tool-key">A</span></button>
+                <button class="tool-item" data-mode="radius" type="button"><span class="tool-icon">⊙</span><span class="tool-copy"><strong data-i18n="tool.radius.title">定半径画弧</strong><small data-i18n="tool.radius.desc">两点定半径，再取圆心与端点</small></span><span class="tool-key">R</span></button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="rail-divider"></div>
         <div class="rail-section rail-section-hints">
           <div class="section-kicker" data-i18n="currentStep">当前步骤</div>
-          <div class="step-card"><span class="step-number">01</span><div class="step-content"><strong id="toolTitle">选择 / 添加点</strong><p id="helperLine">点击任意位置创建点；点击交点或端点可继续作图。</p></div></div>
+          <div class="step-card"><span class="step-number" id="stepNumber">01</span><div class="step-content"><strong id="toolTitle">选择 / 添加点</strong><p id="helperLine">点击任意位置创建点；点击交点或端点可继续作图。</p></div></div>
           <div class="tip-row"><span aria-hidden="true">✦</span><span data-i18n-html="panHint">按住 <kbd>Space</kbd> + 拖动平移；滚轮缩放</span></div>
         </div>
         <div class="rail-footer"><span class="save-status"><i class="status-dot"></i><span data-i18n="autosave">本地自动保存</span></span><span class="save-status" data-i18n="escCancel">Esc 取消当前步骤</span></div>
@@ -47,8 +58,8 @@
       <section class="canvas-column">
         <div class="canvas-toolbar"><div class="canvas-breadcrumb"><span class="breadcrumb-dot"></span><span data-i18n="untitled">未命名作图</span><span class="breadcrumb-muted" data-i18n="newDoc">/ 新建</span></div><div class="view-controls"><button class="view-button" id="zoomOutBtn" type="button" aria-label="缩小" data-i18n-aria="zoomOut">−</button><button class="zoom-readout" id="zoomReadout" type="button" aria-label="重置视图" data-i18n-aria="resetView">100%</button><button class="view-button" id="zoomInBtn" type="button" aria-label="放大" data-i18n-aria="zoomIn">＋</button><span class="view-divider"></span><button class="view-button" id="resetViewBtn" type="button" aria-label="重置视图" data-i18n-aria="resetView">⌗</button></div></div>
         <div class="canvas-frame">
-          <div class="canvas-surface" id="canvasSurface" tabindex="0" role="application" aria-label="几何作图画布">
-            <svg id="board" class="construction-overlay" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" aria-label="尺规作图画布">
+          <div class="canvas-surface" id="canvasSurface" tabindex="0" role="application" aria-label="几何作图画布" data-i18n-aria="canvasSurface">
+            <svg id="board" class="construction-overlay" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" aria-label="尺规作图画布" data-i18n-aria="canvasBoard">
               <defs><pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#26313f" stroke-opacity=".045" stroke-width="1"/></pattern><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#smallGrid)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#26313f" stroke-opacity=".075" stroke-width="1"/></pattern></defs>
               <rect class="board-surface" width="1200" height="760" fill="url(#grid)" />
               <g id="world"><g id="referenceLayer"></g><g id="geometryLayer"></g><g id="pointLayer"></g><g id="cursorLayer"><circle r="7" class="cursor-ring"/><circle r="2" class="cursor-dot"/></g></g>
@@ -60,17 +71,18 @@
         <div class="canvas-footer"><span data-i18n-html="wheelZoom"><kbd>滚轮</kbd> 缩放</span><span class="footer-divider"></span><span data-i18n-html="spacePan"><kbd>Space</kbd> + 拖动 平移</span><span class="footer-spacer"></span><span class="coordinate-readout" data-i18n="snapHint">交点自动吸附 · 所有点可继续作图</span></div>
       </section>
 
-      <aside class="inspector" aria-label="作图信息">
+      <aside class="inspector" aria-label="作图信息" data-i18n-aria="inspector">
         <div class="inspector-section radius-section">
           <div class="inspector-heading"><span class="section-kicker" data-i18n="compassStatus">圆规状态</span><span class="live-badge" id="compassLiveBadge"><i></i><span id="compassLiveLabel">待设定</span></span></div>
           <div class="radius-display"><span class="radius-value" id="radiusReadout">150 px</span><span class="radius-unit" data-i18n="currentRadius">当前半径</span></div>
           <div class="compass-state-card" id="compassStateCard" data-state="idle"><span class="compass-state-icon">◉</span><div><strong id="compassStateLabel">圆规待设定</strong><small id="compassStateHint">先用“定半径”点取两点，或直接输入半径。</small></div></div>
-          <div class="radius-editor"><label for="radiusInput" data-i18n="freeRadius">自由设定</label><div class="radius-input-row"><input id="radiusInput" type="number" min="10" max="1000" step="1" value="150" /><button id="applyRadius" type="button" data-i18n="apply">应用</button></div><input id="radiusSlider" type="range" min="20" max="300" value="150" aria-label="半径滑块" /></div>
+          <div class="radius-editor"><label for="radiusInput" data-i18n="freeRadius">自由设定</label><div class="radius-input-row"><input id="radiusInput" type="number" min="10" max="1000" step="1" value="150" /><button id="applyRadius" type="button" data-i18n="apply">应用</button></div><input id="radiusSlider" type="range" min="20" max="300" value="150" aria-label="半径滑块" data-i18n-aria="radiusSlider" /></div>
+          <button class="reuse-radius-button" id="reuseRadiusBtn" type="button" data-i18n="reuseRadius">使用当前半径（C）</button>
           <button class="toggle-button" id="arcModeToggle" type="button"><span><span data-i18n="currentMode">当前模式：</span><strong id="arcModeLabel">画弧</strong></span><span data-i18n="switch">切换 ↔</span></button>
           <p class="inspector-note" data-i18n="compassNote">两点确定半径后，圆规会持续保持这个长度；切换直尺或重新定半径时，状态会同步更新。</p>
         </div>
         <div class="inspector-section history-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="canvasStats">画布统计</span></div><div class="stats-grid"><div><strong id="entityCount">0 <span data-i18n="objects">个对象</span></strong><small data-i18n="completed">已完成</small></div><div><strong id="pointCount">0 <span data-i18n="points">点</span></strong><small data-i18n="interactivePoints">可交互点</small></div></div><div class="selection-card" id="selectionCard"><span class="selection-dot"></span><span data-i18n="selectionHelp">点线可选中；选中辅助线后可加粗为最终结果</span></div><button class="finalize-button" id="finalizeBtn" type="button" disabled data-i18n="finalize">加粗为最终结果</button></div>
-        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.radius.title">定半径</span><kbd>R</kbd></div><div><span data-i18n="tool.compass.title">画弧 / 画圆</span><kbd>C</kbd></div><div><span data-i18n="tool.line.short">对齐两点</span><kbd>L</kbd></div></div></div>
+        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div></div></div>
       </aside>
     </section>
   </main>
