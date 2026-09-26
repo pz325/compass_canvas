@@ -29,7 +29,7 @@ const translations = {
     statusLine: "直尺模式：请点击第一个对齐点。", statusCompassCircle: "整圆模式：请点击圆心。", statusCompassArc: "圆弧模式：请点击圆心。",
     statusEntityDone: "{entity}已完成；交点已自动生成，可继续点取。", statusSelectedPoint: "已选中点 ({x}, {y})。可切换工具继续作图。",
     statusRadiusFirst: "已记录第一个点，请点击第二个点确定半径。", statusTooClose: "两点距离太近，请换两个不同的点。",
-    statusRadiusAuto: "半径已设为 {radius} px。已自动切换到画圆，请点击圆心。", statusLineFirst: "已记录第一个对齐点，请点击第二个对齐点确定直线方向。",
+    statusRadiusAuto: "半径已设为 {radius} px。已自动切换到圆规作图，请点击圆心。", statusLineFirst: "已记录第一个对齐点，请点击第二个对齐点确定直线方向。",
     statusLineNear: "两个对齐点太近，请换一个点确定方向。", statusLineDirection: "直线方向已确定，请在线上点击线段起点。",
     statusLineStart: "已记录线段起点，请在线上点击线段终点。", statusLineTooClose: "线段起点和终点太近，请在线上选择另一个点。",
     statusCircleCenter: "已记录圆心，点击画布完成整圆。", statusArcCenter: "已记录圆心，请点击圆周上的起点。", statusArcSame: "起点不能和圆心重合，请点在圆周方向上。",
@@ -40,7 +40,7 @@ const translations = {
     entityLine: "直线段", entityCircle: "圆", entityArc: "圆弧", modeCircle: "整圆模式：请点击圆心。", modeArc: "圆弧模式：请点击圆心。",
     selectedFinal: "已是最终结果", arcCircle: "整圆", arcDraw: "画弧", pointIntersectionTitle: "交点 · 可继续点取", pointInteractiveTitle: "可交互点",
     helperSelect: "点击任意位置创建点；点击金色交点或端点可继续用于后续作图。", helperRadius: "依次点击两个点，以两点距离作为圆规半径。也可以在左侧输入框直接设定。",
-    helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。",
+    helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。", helperCompassArc: "依次点击圆心、圆周上的起点和终点，按当前半径画出对应圆弧。", helperCompassCircle: "点击圆心即可画出整圆；使用右侧切换按钮可改为画弧。",
     noCompassRadius: "尚未设定圆规半径。", languageToggle: "切换语言", selectedAux: "已选中辅助对象", selectedPoint: "已选点 ({x}, {y})",
     editActions: "编辑操作", workspace: "尺规作图工作区", toolRail: "作图工具", toolToolbar: "选择作图工具", canvasSurface: "几何作图画布", canvasBoard: "尺规作图画布", inspector: "作图信息", radiusSlider: "半径滑块",
   },
@@ -65,7 +65,7 @@ const translations = {
     statusLine: "Straightedge mode: click the first alignment point.", statusCompassCircle: "Circle mode: click the center.", statusCompassArc: "Arc mode: click the center.",
     statusEntityDone: "{entity} completed; intersections are ready to reuse.", statusSelectedPoint: "Selected point ({x}, {y}). Switch tools to continue.",
     statusRadiusFirst: "First point recorded. Click the second point to set the radius.", statusTooClose: "Those points are too close. Choose two different points.",
-    statusRadiusAuto: "Radius set to {radius} px. Switched to circle mode; click a center.", statusLineFirst: "First alignment point recorded. Click the second point to set the direction.",
+    statusRadiusAuto: "Radius set to {radius} px. Switched to compass drawing; click a center.", statusLineFirst: "First alignment point recorded. Click the second point to set the direction.",
     statusLineNear: "Those alignment points are too close. Choose another point.", statusLineDirection: "Direction set. Click the segment start on the guide line.",
     statusLineStart: "Segment start recorded. Click the segment end on the guide line.", statusLineTooClose: "The segment is too short. Choose another point on the guide line.",
     statusCircleCenter: "Center recorded. Click the canvas to complete the circle.", statusArcCenter: "Center recorded. Click the start direction on the circle.", statusArcSame: "The start cannot overlap the center. Click toward the circle.",
@@ -76,7 +76,7 @@ const translations = {
     entityLine: "Segment", entityCircle: "Circle", entityArc: "Arc", modeCircle: "Circle mode: click the center.", modeArc: "Arc mode: click the center.",
     selectedFinal: "Already final", arcCircle: "Circle", arcDraw: "Draw arc", pointIntersectionTitle: "Intersection · ready to reuse", pointInteractiveTitle: "Interactive point",
     helperSelect: "Click anywhere to create a point; click a highlighted intersection or endpoint to reuse it.", helperRadius: "Pick two points in order to use their distance as the compass radius, or enter a value on the left.",
-    helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.",
+    helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.", helperCompassArc: "Click the center, then the start and end points on the circle to draw the arc at the current radius.", helperCompassCircle: "Click the center to draw a full circle. Use the switch button to draw an arc instead.",
     noCompassRadius: "The compass radius is not set.", languageToggle: "Switch language", selectedAux: "Auxiliary object selected", selectedPoint: "Point selected ({x}, {y})",
     editActions: "Edit actions", workspace: "Straightedge and compass workspace", toolRail: "Construction tools", toolToolbar: "Choose a construction tool", canvasSurface: "Geometry construction canvas", canvasBoard: "Straightedge and compass canvas", inspector: "Construction details", radiusSlider: "Radius slider",
   },
@@ -321,12 +321,27 @@ function allPoints() {
   return uniquePoints(points);
 }
 
+function entityPoints() {
+  const points = [];
+  for (const item of state.entities) {
+    if (item.type === "line") points.push(item.p1, item.p2);
+    if (item.type === "circle") points.push(item.center);
+    if (item.type === "arc") points.push(item.center, item.start, item.end);
+  }
+  return uniquePoints(points);
+}
+
 function pointKinds() {
   const intersections = allIntersections();
   const points = allPoints();
+  const derived = entityPoints();
   const merged = [...points, ...intersections];
   const unique = uniquePoints(merged);
-  return unique.map((point) => ({ point, isIntersection: intersections.some((p) => pointNear(p, point, 0.02)) }));
+  return unique.map((point) => {
+    const isIntersection = intersections.some((p) => pointNear(p, point, 0.02));
+    const isDerived = derived.some((p) => pointNear(p, point, 0.02));
+    return { point, isIntersection, isStandalone: !isIntersection && !isDerived };
+  });
 }
 
 function screenToSvg(evt) {
@@ -409,7 +424,10 @@ function setStatus(text) {
 function updateToolCopy() {
   const copy = toolCopy[state.mode];
   if (!copy) return;
-  helperLine.textContent = t(copy.helperKey);
+  const helperKey = state.mode === "compass"
+    ? (state.arcMode === "circle" ? "helperCompassCircle" : "helperCompassArc")
+    : copy.helperKey;
+  helperLine.textContent = t(helperKey);
   document.querySelector("#toolTitle").textContent = t(copy.titleKey);
   document.querySelectorAll("[data-mode]").forEach((button) => button.classList.toggle("active", button.dataset.mode === state.mode));
   document.querySelector("#arcModeToggle").classList.toggle("active", state.arcMode === "circle");
@@ -599,7 +617,6 @@ function handleCanvasClick(rawPoint) {
       addOperationPoint(point);
       state.pending = [];
       state.mode = "compass";
-      state.arcMode = "circle";
       state.radiusPicking = false;
       state.pending = [];
       state.lineGuide = null;
@@ -801,9 +818,10 @@ function renderPreview() {
 
 function renderPoints() {
   pointLayer.replaceChildren();
-  for (const { point, isIntersection } of pointKinds()) {
+  for (const { point, isIntersection, isStandalone } of pointKinds()) {
     const selected = state.selectedPoint && pointNear(state.selectedPoint, point, 0.02);
-    const node = el("g", { class: `point-node ${isIntersection ? "intersection-point" : "construction-point"} ${selected ? "selected-point" : ""}`, tabindex: "0" });
+    const pointKind = isIntersection ? "intersection-point" : isStandalone ? "standalone-point" : "derived-point";
+    const node = el("g", { class: `point-node ${pointKind} ${selected ? "selected-point" : ""}`, tabindex: "0" });
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: isIntersection ? 3.5 : 3, class: "point-visual" }));
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hover-ring" }));
     if (isIntersection) node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 10, class: "point-hit-area" }));
@@ -966,7 +984,9 @@ board.addEventListener("pointerleave", () => {
   renderPreview();
 });
 board.addEventListener("pointerdown", (event) => {
-  if (event.button === 1 || event.button === 2 || event.shiftKey || state.spacePressed || event.target === board || event.target.classList.contains("board-surface")) {
+  // A normal left click selects a point on the guide or canvas. Panning is
+  // explicit: middle/right mouse, Shift, or Space + drag.
+  if (event.button === 1 || event.button === 2 || event.shiftKey || state.spacePressed) {
     const svgPoint = screenToSvg(event);
     state.isPanning = true;
     state.panMoved = false;

@@ -168,6 +168,12 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .point-node:focus .point-hover-ring,
 .construction-overlay .point-node.selected-point > .point-visual { opacity: 1; }
 .live-badge[data-state="idle"] { color: var(--ink-faint); }
+
+/* Independent points are construction anchors; endpoints and intersections
+   remain quiet so the geometry stays visually light until hovered. */
+.construction-overlay .point-node.standalone-point > .point-visual { opacity: .78; stroke-width: 1.8; }
+.construction-overlay .point-node.derived-point > .point-visual,
+.construction-overlay .point-node.intersection-point > .point-visual { opacity: .12; stroke-width: 1.1; }
 .construction-overlay .point-node > .point-visual { opacity: .12; stroke-width: 1.1; }
 .live-badge[data-state="idle"] { color: var(--ink-faint); }
 .construction-overlay .geometry-line,
