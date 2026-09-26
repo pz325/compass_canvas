@@ -365,6 +365,7 @@ function applyLanguage() {
   const lang = translations[state.language] ? state.language : "zh";
   state.language = lang;
   document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.body.dataset.language = lang;
   document.title = t("documentTitle");
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     const key = node.dataset.i18n;
@@ -390,6 +391,12 @@ function applyLanguage() {
     languageToggle.textContent = lang === "zh" ? "EN" : "中文";
     languageToggle.setAttribute("aria-label", t("languageToggle"));
   }
+  refreshDynamicLabels();
+}
+
+// Dynamic labels are rendered by the geometry state, so refresh them together
+// with the static data-i18n nodes whenever the language changes.
+function refreshDynamicLabels() {
   updateToolCopy();
   syncRadiusControls();
   render();
