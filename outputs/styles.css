@@ -374,6 +374,14 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .geometry-piece:hover > .final-geometry { opacity: 1; }
 .construction-overlay[data-mode="bold"] #pointLayer * { pointer-events: none; }
 
+/* Quick tools highlight the original construction and keep chosen
+   intersections legible without introducing new hit targets. */
+.construction-overlay .quick-object-highlight { fill: none; stroke: #198d99; stroke-width: 4; stroke-linecap: round; opacity: .62; pointer-events: none; vector-effect: non-scaling-stroke; }
+.construction-overlay .quick-construction-preview { fill: none; stroke: #167b87; stroke-width: 2; stroke-dasharray: 7 5; stroke-linecap: round; opacity: .9; pointer-events: none; vector-effect: non-scaling-stroke; }
+.construction-overlay .priority-intersection { fill: #e4fbfa; stroke: #087f8c; stroke-width: 2; opacity: 1; pointer-events: none; vector-effect: non-scaling-stroke; }
+.construction-overlay .priority-intersection-label { fill: #086f79; stroke: #f4f5f7; stroke-width: 3; paint-order: stroke fill; font-family: "DM Mono", ui-monospace, monospace; font-weight: 500; pointer-events: none; vector-effect: non-scaling-stroke; }
+.rail-section-tools { flex: 1 1 auto; min-height: 0; padding-bottom: 8px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
 /* Named projects and a compact construction timeline remain available even
    when the inspector is hidden on smaller screens. */
 .project-actions { display: flex; align-items: center; gap: 5px; padding-right: 9px; margin-right: 5px; border-right: 1px solid var(--border); }
@@ -458,4 +466,5 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
   .construction-history-content { max-height: 185px; }
   .playback-speed { margin-left: auto; }
   .projects-dialog { padding: 15px; }
+  .rail-section-tools { flex: 0 0 auto; overflow-y: visible; }
 }

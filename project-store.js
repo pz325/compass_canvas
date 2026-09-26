@@ -7,8 +7,8 @@
   const LIBRARY_FORMAT = "compasscanvas-library";
   const MAX_BYTES = 15 * 1024 * 1024;
   const MAX_ITEMS = 10000;
-  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint"]);
-  const STEP_KINDS = new Set(["tool", "point", "pick", "radius", "draw", "style", "undo", "cancel", "clear"]);
+  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint", "bisector", "perpendicular", "angleBisector", "intersections"]);
+  const STEP_KINDS = new Set(["tool", "point", "pick", "radius", "draw", "style", "undo", "cancel", "clear", "objectPick", "intersection"]);
   const UNSAFE_KEYS = new Set(["__proto__", "prototype", "constructor"]);
   const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
@@ -197,6 +197,31 @@
     }
   }
 
+  function uniquePointList(value, label, limit = 2) {
+    array(value, label, limit);
+    value.forEach((item, index) => {
+      point(item, `${label}[${index}]`);
+      for (let previous = 0; previous < index; previous += 1) {
+        if (Math.hypot(item.x - value[previous].x, item.y - value[previous].y) <= 1e-6) invalid(`${label} must contain distinct points.`);
+      }
+    });
+  }
+
+  function construction(value, label) {
+    object(value, label);
+    const pointCounts = { bisector: 2, perpendicular: 1, angleBisector: 3 };
+    if (!own(pointCounts, value.kind)) invalid(`${label} has an unsupported construction kind.`);
+    array(value.points, `${label}.points`, 3);
+    if (value.points.length !== pointCounts[value.kind]) invalid(`${label} has the wrong number of source points.`);
+    value.points.forEach((item, index) => point(item, `${label}.points[${index}]`));
+    array(value.objects, `${label}.objects`, 1);
+    if (value.objects.length !== (value.kind === "perpendicular" ? 1 : 0)) invalid(`${label} has the wrong number of source objects.`);
+    value.objects.forEach((item, index) => {
+      entity(item, `${label}.objects[${index}]`);
+      if (item.type !== "line") invalid(`${label} requires a line as its source object.`);
+    });
+  }
+
   function snapshot(value, label) {
     object(value, label);
     array(value.entities, `${label}.entities`);
@@ -209,12 +234,16 @@
       pending: [], lineGuide: null, radiusReady: false, radiusSource: null,
       lastArc: null, mode: "select", arcMode: "arc", operationPoints: [],
       selectedPoint: null, selectedEntityIndex: null, panX: 0, panY: 0, scale: 1,
+      intersectionSelection: [], priorityIntersections: [],
     };
     for (const [key, fallback] of Object.entries(defaults)) if (!own(value, key)) value[key] = fallback;
     for (const key of ["pending", "operationPoints"]) {
       array(value[key], `${label}.${key}`);
       value[key].forEach((item, index) => point(item, `${label}.${key}[${index}]`));
     }
+    array(value.intersectionSelection, `${label}.intersectionSelection`, 1);
+    value.intersectionSelection.forEach((item, index) => entity(item, `${label}.intersectionSelection[${index}]`));
+    uniquePointList(value.priorityIntersections, `${label}.priorityIntersections`);
     boolean(value.radiusReady, `${label}.radiusReady`);
     if (!MODES.has(value.mode)) invalid(`${label}.mode is unsupported.`);
     if (value.arcMode !== "arc" && value.arcMode !== "circle") invalid(`${label}.arcMode is unsupported.`);
@@ -255,12 +284,12 @@
     if (!STEP_KINDS.has(kind)) invalid(`${label} has an unsupported construction step.`);
     object(data, `${label}.data`);
     if (own(data, "tool") && !MODES.has(data.tool)) invalid(`${label}.tool is unsupported.`);
-    if (["tool", "pick", "draw"].includes(kind) && !MODES.has(data.tool)) invalid(`${label} must name a supported tool.`);
+    if (["tool", "pick", "draw", "objectPick", "intersection"].includes(kind) && !MODES.has(data.tool)) invalid(`${label} must name a supported tool.`);
     if (kind === "point" || kind === "pick" || own(data, "point")) point(data.point, `${label}.point`);
     if ((kind === "pick" || own(data, "stage")) && (!Number.isInteger(data.stage) || data.stage <= 0)) invalid(`${label}.stage must be a positive integer.`);
     if (own(data, "radiusSource") && data.radiusSource !== null) radiusSource(data.radiusSource, `${label}.radiusSource`);
     if (kind === "radius") radiusSource(data.radiusSource, `${label}.radiusSource`);
-    if (kind === "draw" || kind === "style" || own(data, "geometry")) entity(data.geometry, `${label}.geometry`);
+    if (kind === "draw" || kind === "style" || kind === "objectPick" || own(data, "geometry")) entity(data.geometry, `${label}.geometry`);
     if (kind === "draw" || own(data, "alignment")) {
       array(data.alignment, `${label}.alignment`);
       data.alignment.forEach((item, index) => point(item, `${label}.alignment[${index}]`));
@@ -270,6 +299,22 @@
       else if (data.property === "color") {
         if (data.value !== null && (typeof data.value !== "string" || !/^#[0-9a-f]{6}$/i.test(data.value))) invalid(`${label}.value must be a color or null.`);
       } else invalid(`${label} has an unsupported style property.`);
+    }
+    if (own(data, "construction") && data.construction !== null) {
+      construction(data.construction, `${label}.construction`);
+      if (kind === "draw" && data.geometry.type !== "line") invalid(`${label} construction must produce a line.`);
+    }
+    if (kind === "objectPick" || kind === "intersection") {
+      if (data.tool !== "intersections") invalid(`${label} must use the intersections tool.`);
+    }
+    if (kind === "intersection" || own(data, "objects")) {
+      array(data.objects, `${label}.objects`, 2);
+      data.objects.forEach((item, index) => entity(item, `${label}.objects[${index}]`));
+      if (kind === "intersection" && data.objects.length !== 2) invalid(`${label} must contain two intersection objects.`);
+    }
+    if (kind === "intersection" || own(data, "points")) {
+      uniquePointList(data.points, `${label}.points`);
+      if (kind === "intersection" && !data.points.length) invalid(`${label} must contain at least one intersection point.`);
     }
     if (kind === "undo" && own(data, "before")) snapshot(data.before, `${label}.before`);
   }

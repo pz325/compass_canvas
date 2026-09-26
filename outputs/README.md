@@ -8,6 +8,7 @@
 
 - Select or create reusable points on the canvas.
 - Choose between two methods for drawing segments and two methods for drawing arcs (see below).
+- Construct perpendicular bisectors, perpendiculars through a point, and internal angle bisectors, or prioritize the exact intersections of two objects.
 - Keep a compass radius for repeated arcs, enter a custom radius, or switch to full-circle drawing.
 - Split segments, arcs, and circles at their intersections into independently selectable pieces. Intersections, endpoints, and centers remain reusable for construction.
 - Keep new pieces as light guides; use **Emphasize** (`B`) to toggle a piece between a guide and a bold final result, or select it to change its color.
@@ -34,6 +35,21 @@ After completing a fixed-radius arc, the compass stays ready to draw another one
 **Use last arc’s radius** copies the radius of the most recently completed arc or circle, including a three-click arc. The radius source is shown below the current value and recorded in the construction process: a direct value, two measured points, or a radius reused from an earlier construction.
 
 Use **Select / add point** (`V`) to create independent points or select a completed piece. Only points that are not on any completed segment, arc, or circle remain visible; hidden endpoints and intersections still snap and can be reused. A circle or arc center remains visible unless another object passes through it.
+
+## Quick constructions
+
+| Tool | Key | Click sequence and result |
+| --- | --- | --- |
+| Perpendicular bisector | `M` | Pick two distinct points, A and B. Draws a perpendicular segment centered at the midpoint of AB, with total length 2 × AB. |
+| Perpendicular through a point | `P` | Pick a point P, then an existing segment. Draws from P to the foot on the segment's supporting line; the foot may lie on its extension. If P is already on that line, draws a perpendicular segment through P. |
+| Angle bisector | `G` | Pick a point A on one side, the vertex V, then a point B on the other side. Draws the internal angle bisector from V beyond AB, with a length of twice the longer of VA and VB. Use three distinct, non-collinear points. |
+| Exact intersections | `I` | Select two drawn objects. Temporarily marks their intersections and gives those points priority within the normal snapping distance. |
+
+These tools create finite segments. Their results start as auxiliary geometry and can be selected, split at intersections, emphasized, or recolored just like other drawn segments.
+
+The perpendicular tool uses the **original drawn segment** when you click any of its split pieces. Exact intersections similarly selects the **original segment, arc, or circle**. For example, selecting two circles finds both of their intersections even if earlier crossings have divided the circles into arcs. The selected objects are highlighted so you can confirm the choice.
+
+Prioritized intersections remain available when you switch to another drawing tool. They stay marked until you press `Esc` or select a new pair of objects. All quick construction actions and their point or object choices are recorded in the construction history, saved with the project, and included in playback.
 
 ## Edit individual pieces
 
@@ -82,6 +98,7 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 
 - 在画布上创建和重复使用可交互点。
 - 画线段有两种方法，画圆弧也有两种方法，具体步骤见下表。
+- 快捷绘制两点垂直中分线、过点垂线和角平分线，也可以优先吸附两个对象的精确交点。
 - 保持圆规半径连续作图，也可以直接输入半径或切换整圆模式。
 - 线段、圆和圆弧在交点处自动分割成可独立选择的片段；交点、端点和圆心都可以继续用于作图。
 - 新片段先作为浅色辅助线显示；使用「加粗」（`B`）逐段切换辅助线与最终结果，也可以选中某一段改变颜色。
@@ -108,6 +125,21 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 「沿用上一圆弧半径」可以复制最近画好的圆弧或整圆的半径，也包括三点画弧的半径。当前半径下方显示其来源，作图过程也会记录它来自直接输入、两点测量，还是某一步已画圆弧的半径。
 
 「选择 / 添加点」（`V`）可以创建孤立点或选中已画好的片段。只有没有落在已画线段、圆弧或圆上的孤立点才显示；隐藏的端点和交点仍可吸附、选择和继续作图。圆或圆弧的圆心在没有其他对象经过时保持显示。
+
+### 快捷作图
+
+| 工具 | 快捷键 | 点击顺序与结果 |
+| --- | --- | --- |
+| 两点垂直中分线 | `M` | 依次选择两个不同的点 A、B。以 AB 中点为中心绘制垂直线段，总长度为 AB 长度的 2 倍。 |
+| 过点作垂线 | `P` | 先选点 P，再选已有线段。绘制 P 到该线段所在直线的垂足之间的线段，垂足可以落在延长线上；如果 P 已在该直线上，则绘制经过 P 的垂直线段。 |
+| 角平分线 | `G` | 依次选择一边上的点 A、顶点 V、另一边上的点 B。从 V 沿内角平分方向延长到 AB 之外，长度为 VA、VB 中较长者的 2 倍。三个点应不同且不共线。 |
+| 精确选交点 | `I` | 依次选择两个已画对象，临时标出它们的交点；在通常的吸附距离内优先吸附这些精确交点。 |
+
+快捷作图生成的是有限线段，默认作为辅助线显示。与其他已画线段一样，它们可以被选中、在交点处分割、加粗或改变颜色。
+
+过点作垂线时，点击任意一个分割后的线段，会选择它所属的**原始线段**；精确选交点同样使用片段所属的**原始线段、圆弧或整圆**。例如，两个圆即使已经被其他交点分割为圆弧，仍可选出这两个原始圆的全部交点。所选对象会高亮，方便确认。
+
+切换到其他作图工具后，优先交点仍可使用；按 `Esc` 或重新选择一对对象会清除原来的临时交点标记。所有快捷作图动作及其取点、选对象过程都会记录到作图历史中，随项目保存，并参与回放。
 
 ### 分段选择、加粗和颜色
 

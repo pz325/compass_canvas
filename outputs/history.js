@@ -7,6 +7,8 @@ Object.assign(translations.zh, {
   reuseLastArc: "沿用上一圆弧半径", saved: "已保存到本机", saving: "正在保存…", saveFailed: "未能保存到本机，请导出任务", noSavedProjects: "还没有已保存的任务。", invalidProject: "任务文件无效或版本不兼容，当前作图未改变。", projectImported: "任务已导入，可以继续作图或回放。", projectOpened: "任务已打开。", projectSaved: "任务及完整过程已保存。", projectNew: "新任务已创建。", playbackStart: "初始画布", playbackFinished: "回放完成；点击“返回作图”继续编辑。", playbackDone: "回放完成，可以继续作图。", playbackViewing: "正在回看第 {index} 步；点击“返回作图”继续编辑。", projectExported: "已导出完整任务，包含图形、过程和半径来源。", svgExported: "已导出 SVG 图形。",
   journalTool: "选择工具：{tool}", journalPoint: "添加点 {point}", journalPick: "{tool} · 第 {stage} 次取点：{point}", journalRadius: "设定半径：{source}", journalDraw: "绘制{shape}：{points}", journalAlign: "对齐 {points}；", journalStyleFinal: "将这一段加粗", journalStyleAux: "取消这一段的加粗", journalStyleColor: "将这一段颜色改为 {color}", journalStyleReset: "恢复这一段的默认颜色", journalUndo: "撤销上一步，恢复此前图形", journalCancel: "取消当前作图，移除临时点", journalClear: "清空画布", journalSteps: "{count} 步",
   radiusFreeSource: "自由取半径 {radius} px", radiusPointsSource: "取 {points} 间的距离：{radius} px", radiusReuseSource: "沿用第 {step} 步圆弧半径：{radius} px", radiusUnknownStep: "此前", radiusSourceLabel: "半径来源：{source}", radiusFreeAnchors: "（圆心 / 起点：{points}）",
+  journalObjectPick: "选择求交对象：{object}", journalIntersection: "求交：{objects}；交点 {points}", journalObjectStep: "第 {step} 步的{shape}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape}（{points}）",
+  journalBisector: "作 {points} 的垂直平分线；", journalPerpendicular: "过 {point} 作{object}的垂线；", journalAngleBisector: "平分角 {points}；",
 });
 Object.assign(translations.en, {
   projectName: "Construction name", newProject: "New", saveProject: "Save", openProjects: "Projects / export",
@@ -15,6 +17,8 @@ Object.assign(translations.en, {
   reuseLastArc: "Use last arc’s radius", saved: "Saved on this device", saving: "Saving…", saveFailed: "Local save failed; export this project", noSavedProjects: "No saved projects yet.", invalidProject: "Invalid or incompatible project file. Your drawing has not changed.", projectImported: "Project imported. Continue drawing or replay its history.", projectOpened: "Project opened.", projectSaved: "Drawing and full history saved.", projectNew: "New project created.", playbackStart: "Initial canvas", playbackFinished: "Playback complete. Return to drawing to continue editing.", playbackDone: "Playback complete. You can continue drawing.", playbackViewing: "Viewing step {index}. Return to drawing to continue editing.", projectExported: "Full project exported with geometry, history and radius sources.", svgExported: "SVG drawing exported.",
   journalTool: "Choose tool: {tool}", journalPoint: "Add point {point}", journalPick: "{tool} · Pick {stage}: {point}", journalRadius: "Set radius: {source}", journalDraw: "Draw {shape}: {points}", journalAlign: "Align through {points}; ", journalStyleFinal: "Emphasize this piece", journalStyleAux: "Remove this piece’s emphasis", journalStyleColor: "Set this piece’s color to {color}", journalStyleReset: "Restore this piece’s default color", journalUndo: "Undo the last action and restore the preceding drawing", journalCancel: "Cancel the current construction and remove temporary points", journalClear: "Clear the canvas", journalSteps: "{count} steps",
   radiusFreeSource: "Free radius: {radius} px", radiusPointsSource: "Distance between {points}: {radius} px", radiusReuseSource: "Reuse the arc radius from step {step}: {radius} px", radiusUnknownStep: "an earlier step", radiusSourceLabel: "Radius source: {source}", radiusFreeAnchors: " (center / start: {points})",
+  journalObjectPick: "Choose intersection object: {object}", journalIntersection: "Intersect {objects}; intersection points: {points}", journalObjectStep: "{shape} from step {step}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape} ({points})",
+  journalBisector: "Construct the perpendicular bisector of {points}; ", journalPerpendicular: "Construct a perpendicular through {point} to {object}; ", journalAngleBisector: "Bisect angle {points}; ",
 });
 translations.zh.notSaved = "新任务，尚未保存";
 translations.en.notSaved = "New project, not saved yet";
@@ -59,6 +63,7 @@ class ConstructionHistory {
   captureScene() {
     const result = {};
     for (const key of ["entities", "freePoints", "pending", "lineGuide", "radius", "radiusReady", "radiusSource", "quickRadiusSource", "pendingOrigins", "lastArc", "mode", "arcMode", "operationPoints", "selectedPoint", "panX", "panY", "scale"]) result[key] = this.clone(state[key]);
+    for (const key of ["intersectionSelection", "priorityIntersections"]) result[key] = this.clone(state[key] || []);
     result.selectedEntityIndex = state.entities.indexOf(state.selectedEntity);
     return result;
   }
@@ -108,6 +113,27 @@ class ConstructionHistory {
     return t("radiusFreeSource", { radius }) + (points ? t("radiusFreeAnchors", { points }) : "");
   }
 
+  geometryPoints(entity) {
+    return entity.type === "line" ? [entity.p1, entity.p2]
+      : entity.type === "arc" ? [entity.center, entity.start, entity.end] : [entity.center];
+  }
+
+  objectText(entity) {
+    const shape = t(entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc");
+    if (entity.constructionId) {
+      const index = this.project.steps.findIndex((step) => step.id === entity.constructionId);
+      return index < 0 ? t("journalObjectId", { shape, id: entity.constructionId }) : t("journalObjectStep", { shape, step: index + 1 });
+    }
+    return t("journalObjectCoordinates", { shape, points: this.geometryPoints(entity).map((point) => this.pointText(point)).join(" → ") });
+  }
+
+  constructionText(construction) {
+    if (!construction) return "";
+    const points = construction.points.map((point) => this.pointText(point));
+    if (construction.kind === "perpendicular") return t("journalPerpendicular", { point: points[0], object: this.objectText(construction.objects[0]) });
+    return t(construction.kind === "bisector" ? "journalBisector" : "journalAngleBisector", { points: points.join(construction.kind === "bisector" ? " ↔ " : " → ") });
+  }
+
   describe(step) {
     const data = step.data || {};
     const tool = t(toolCopy[data.tool]?.titleKey || "tool.select.title");
@@ -118,11 +144,13 @@ class ConstructionHistory {
       return data.radiusSource ? `${pick} · ${this.sourceText(data.radiusSource)}` : pick;
     }
     if (step.kind === "radius") return t("journalRadius", { source: this.sourceText(data.radiusSource) });
+    if (step.kind === "objectPick") return t("journalObjectPick", { object: this.objectText(data.geometry) });
+    if (step.kind === "intersection") return t("journalIntersection", { objects: data.objects.map((entity) => this.objectText(entity)).join(" ∩ "), points: data.points.map((point) => this.pointText(point)).join("; ") });
     if (step.kind === "draw") {
       const entity = data.geometry;
       const points = (entity.type === "line" ? [entity.p1, entity.p2] : entity.type === "arc" ? [entity.center, entity.start, entity.end] : [entity.center]).map((p) => this.pointText(p)).join(" → ");
       const aligned = data.alignment?.length ? t("journalAlign", { points: data.alignment.map((p) => this.pointText(p)).join(" ↔ ") }) : "";
-      return aligned + t("journalDraw", { shape: t(entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc"), points }) + (entity.radiusSource ? ` · ${this.sourceText(entity.radiusSource)}` : "");
+      return this.constructionText(data.construction) + aligned + t("journalDraw", { shape: t(entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc"), points }) + (entity.radiusSource ? ` · ${this.sourceText(entity.radiusSource)}` : "");
     }
     if (step.kind === "style") return data.property === "final" ? t(data.value ? "journalStyleFinal" : "journalStyleAux") : data.value ? t("journalStyleColor", { color: data.value }) : t("journalStyleReset");
     return t({ undo: "journalUndo", cancel: "journalCancel", clear: "journalClear" }[step.kind] || "constructionHistory");
@@ -133,8 +161,11 @@ class ConstructionHistory {
     const recorded = this.clone(data);
     if (recorded.point) recorded.point = this.pointReference(recorded.point);
     if (recorded.alignment) recorded.alignment = recorded.alignment.map((p) => this.pointReference(p));
+    if (recorded.points) recorded.points = recorded.points.map((point) => this.pointReference(point));
+    if (recorded.construction) recorded.construction.points = recorded.construction.points.map((point) => this.pointReference(point));
     const geometry = recorded.geometry;
     if (geometry) for (const key of ["p1", "p2", "center", "start", "end"]) if (geometry[key]) this.pointReference(geometry[key]);
+    for (const object of [...(recorded.objects || []), ...(recorded.construction?.objects || [])]) this.geometryPoints(object).forEach((point) => this.pointReference(point));
     this.project.scene = this.captureScene();
     this.project.steps.push({ id: this.nextStepId(), kind, data: recorded, scene: this.clone(this.project.scene) });
     this.dirty = true;
@@ -354,9 +385,34 @@ class ConstructionHistory {
     const data = step.data;
     const source = data.radiusSource || data.geometry?.radiusSource;
     const origin = source?.kind === "reuse" ? source.origin : source;
-    const points = origin?.points?.length ? origin.points : data.alignment?.length ? data.alignment : data.point ? [data.point] : [];
+    const objects = [...(data.objects || []), ...(data.construction?.objects || []), ...(step.kind === "objectPick" ? [data.geometry] : [])];
+    const sourcePoints = [
+      ...(origin?.points || []), ...(data.alignment || []), ...(data.point ? [data.point] : []),
+      ...(data.points || []), ...(data.construction?.points || []), ...objects.flatMap((object) => this.geometryPoints(object)),
+    ];
+    const pointKeys = new Set();
+    const points = sourcePoints.filter((point) => {
+      const key = makePointKey(point);
+      if (pointKeys.has(key)) return false;
+      pointKeys.add(key);
+      return true;
+    });
     const group = el("g", { "pointer-events": "none", class: "playback-annotation" });
-    if (points.length >= 2) group.appendChild(el("line", { x1: points[0].x, y1: points[0].y, x2: points[1].x, y2: points[1].y, stroke: "#39749c", "stroke-width": 2, "stroke-dasharray": "6 4" }));
+    const line = (a, b) => group.appendChild(el("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: "#39749c", "stroke-width": 2, "stroke-dasharray": "6 4" }));
+    if (data.construction?.kind === "angleBisector") {
+      line(data.construction.points[0], data.construction.points[1]);
+      line(data.construction.points[1], data.construction.points[2]);
+    } else if (data.construction?.kind === "bisector") line(...data.construction.points);
+    else {
+      const pairedPoints = origin?.points?.length ? origin.points : data.alignment || [];
+      if (pairedPoints.length >= 2) line(pairedPoints[0], pairedPoints[1]);
+    }
+    for (const object of objects) {
+      const style = { fill: "none", stroke: "#39749c", "stroke-width": 2, "stroke-dasharray": "6 4", class: "playback-source-object" };
+      if (object.type === "line") group.appendChild(el("line", { ...style, x1: object.p1.x, y1: object.p1.y, x2: object.p2.x, y2: object.p2.y }));
+      else if (object.type === "circle") group.appendChild(el("circle", { ...style, cx: object.center.x, cy: object.center.y, r: object.radius }));
+      else group.appendChild(el("path", { ...style, d: arcPath(object) }));
+    }
     for (const point of points) {
       group.appendChild(el("circle", { cx: point.x, cy: point.y, r: 5, fill: "#e5f3ff", stroke: "#39749c", "stroke-width": 1.5 }));
       group.appendChild(el("text", { x: point.x + 9, y: point.y - 9, fill: "#245779", "font-size": 13 }, this.pointText(point)));

@@ -50,6 +50,15 @@
                 <button class="tool-item" data-mode="radius" type="button"><span class="tool-icon">⊙</span><span class="tool-copy"><strong data-i18n="tool.radius.title">定半径画弧</strong><small data-i18n="tool.radius.desc">两点定半径，再取圆心与端点</small></span><span class="tool-key">R</span></button>
               </div>
             </div>
+            <div class="tool-group" role="group" aria-labelledby="quickToolsLabel">
+              <div class="tool-group-title" id="quickToolsLabel" data-i18n="toolGroupQuick">快捷作图</div>
+              <div class="tool-group-items">
+                <button class="tool-item" data-mode="bisector" type="button"><span class="tool-icon" aria-hidden="true">⊥</span><span class="tool-copy"><strong data-i18n="tool.bisector.title">两点垂直中分线</strong><small data-i18n="tool.bisector.desc">两点确定垂直中分线</small></span><span class="tool-key">M</span></button>
+                <button class="tool-item" data-mode="perpendicular" type="button"><span class="tool-icon" aria-hidden="true">⟂</span><span class="tool-copy"><strong data-i18n="tool.perpendicular.title">过点作垂线</strong><small data-i18n="tool.perpendicular.desc">先选点，再选线段</small></span><span class="tool-key">P</span></button>
+                <button class="tool-item" data-mode="angleBisector" type="button"><span class="tool-icon" aria-hidden="true">∠</span><span class="tool-copy"><strong data-i18n="tool.angleBisector.title">角平分线</strong><small data-i18n="tool.angleBisector.desc">边上一点 → 顶点 → 另一边点</small></span><span class="tool-key">G</span></button>
+                <button class="tool-item" data-mode="intersections" type="button"><span class="tool-icon" aria-hidden="true">⋈</span><span class="tool-copy"><strong data-i18n="tool.intersections.title">精确选交点</strong><small data-i18n="tool.intersections.desc">选两个对象，优先吸附交点</small></span><span class="tool-key">I</span></button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="rail-divider"></div>
@@ -71,7 +80,7 @@
             <svg id="board" class="construction-overlay" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" aria-label="尺规作图画布" data-i18n-aria="canvasBoard">
               <defs><pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#26313f" stroke-opacity=".045" stroke-width="1"/></pattern><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#smallGrid)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#26313f" stroke-opacity=".075" stroke-width="1"/></pattern></defs>
               <rect class="board-surface" width="1200" height="760" fill="url(#grid)" />
-              <g id="world"><g id="referenceLayer"></g><g id="geometryLayer"></g><g id="pointLayer"></g><g id="cursorLayer"><circle r="7" class="cursor-ring"/><circle r="2" class="cursor-dot"/></g></g>
+              <g id="world"><g id="referenceLayer"></g><g id="geometryLayer"></g><g id="quickOverlayLayer" pointer-events="none"></g><g id="pointLayer"></g><g id="cursorLayer"><circle r="7" class="cursor-ring"/><circle r="2" class="cursor-dot"/></g></g>
             </svg>
             <div class="canvas-empty-state" id="emptyState"><div class="empty-illustration"><span class="empty-ring"></span><span class="empty-cross empty-cross-x"></span><span class="empty-cross empty-cross-y"></span><span class="empty-dot"></span></div><h2 data-i18n="emptyTitle">从一个点开始</h2><p data-i18n="emptyDesc">选择左侧工具，然后在画布上点取位置</p><span class="empty-hint" data-i18n-html="emptyHint"><kbd>R</kbd> 定半径 <i></i><kbd>C</kbd> 画弧 / 圆 <i></i><kbd>L</kbd> 画直线</span></div>
           </div>
@@ -120,7 +129,7 @@
             <button id="resetSegmentColor" type="button" disabled data-i18n="resetSegmentColor">默认</button>
           </div>
         </div>
-        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.bold.title">加粗</span><kbd>B</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div></div></div>
+        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.bold.title">加粗</span><kbd>B</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div><div><span data-i18n="tool.bisector.title">两点垂直中分线</span><kbd>M</kbd></div><div><span data-i18n="tool.perpendicular.title">过点作垂线</span><kbd>P</kbd></div><div><span data-i18n="tool.angleBisector.title">角平分线</span><kbd>G</kbd></div><div><span data-i18n="tool.intersections.title">精确选交点</span><kbd>I</kbd></div></div></div>
       </aside>
     </section>
   </main>

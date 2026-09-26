@@ -98,6 +98,41 @@ const translations = {
   },
 };
 
+Object.assign(translations.zh, {
+  toolGroupQuick: "快捷作图",
+  "tool.bisector.title": "垂直中分线", "tool.bisector.desc": "两点确定垂直中分线",
+  "tool.perpendicular.title": "过点作垂线", "tool.perpendicular.desc": "先选点，再选线段",
+  "tool.angleBisector.title": "角平分线", "tool.angleBisector.desc": "边上一点 → 顶点 → 另一边点",
+  "tool.intersections.title": "精确选交点", "tool.intersections.desc": "选两个对象，优先吸附交点",
+  statusBisector: "垂直中分线：请选择第一个点。", statusBisectorSecond: "请选择第二个点，直接生成垂直中分线。",
+  statusPerpendicular: "过点作垂线：先选择要经过的点。", statusPerpendicularLine: "点击一条线段，将选定点连接到垂足；支持线段的延长线。",
+  statusPerpendicularMiss: "请选择一条直线段。", statusPerpendicularExtended: "垂线已完成，垂足位于所选线段的延长线上。",
+  statusAngleFirst: "角平分线：先选择一条边上的点。", statusAngleVertex: "请选择角的顶点（第二个点）。", statusAngleLast: "请选择另一条边上的点，完成内角平分线。",
+  statusAngleInvalid: "这三个点不能确定一个角，请选择不同且不共线的点。",
+  statusIntersectionFirst: "点击第一个线段或圆弧；点击任一分段会选中原始对象。", statusIntersectionSecond: "第一个对象已高亮，请点击第二个对象。",
+  statusIntersectionMiss: "请点击线段或圆弧。", statusIntersectionSame: "请选择另一个对象；同一次作图的分段属于同一对象。",
+  statusIntersectionNone: "两个对象没有独立交点，请换一个对象；重合部分不作为交点。",
+  statusIntersectionReady: "已高亮 {count} 个交点。切换作图工具后，附近取点会优先吸附；Esc 取消高亮。",
+  helperIntersectionReady: "交点已高亮，可切换工具继续取点。点击新对象可重新选择一对；Esc 清除高亮。",
+});
+Object.assign(translations.en, {
+  toolGroupQuick: "Quick constructions",
+  "tool.bisector.title": "Perpendicular bisector", "tool.bisector.desc": "Pick two points to bisect",
+  "tool.perpendicular.title": "Perpendicular through point", "tool.perpendicular.desc": "Pick a point, then a segment",
+  "tool.angleBisector.title": "Angle bisector", "tool.angleBisector.desc": "Side point → vertex → other side",
+  "tool.intersections.title": "Find intersections", "tool.intersections.desc": "Pick two objects to prioritize hits",
+  statusBisector: "Perpendicular bisector: choose the first point.", statusBisectorSecond: "Choose the second point to draw the perpendicular bisector.",
+  statusPerpendicular: "Perpendicular: choose the point to pass through.", statusPerpendicularLine: "Click a segment to connect the point to its perpendicular foot, including on its extension.",
+  statusPerpendicularMiss: "Choose a straight segment.", statusPerpendicularExtended: "Perpendicular drawn. Its foot is on the selected segment’s extension.",
+  statusAngleFirst: "Angle bisector: choose a point on the first side.", statusAngleVertex: "Choose the vertex of the angle (the second point).", statusAngleLast: "Choose a point on the other side to draw the internal angle bisector.",
+  statusAngleInvalid: "Choose three distinct, non-collinear points to define an angle.",
+  statusIntersectionFirst: "Click the first segment or arc; any split piece selects the original object.", statusIntersectionSecond: "First object highlighted. Click the second object.",
+  statusIntersectionMiss: "Click a segment or arc.", statusIntersectionSame: "Choose a different object; pieces from one construction belong to the same object.",
+  statusIntersectionNone: "No isolated intersections. Choose another object; overlapping portions do not count as points.",
+  statusIntersectionReady: "Highlighted {count} intersections. Switch tools to snap to them first when nearby; Esc clears highlights.",
+  helperIntersectionReady: "Intersections highlighted. Switch tools to use them, click a new object to choose another pair, or press Esc to clear.",
+});
+
 function t(key, vars = {}) {
   const lang = state?.language || "zh";
   let text = translations[lang]?.[key] ?? translations.zh[key] ?? key;
@@ -118,6 +153,7 @@ const board = document.querySelector("#board");
 const world = document.querySelector("#world");
 const geometryLayer = document.querySelector("#geometryLayer");
 const referenceLayer = document.querySelector("#referenceLayer");
+const quickOverlayLayer = document.querySelector("#quickOverlayLayer");
 const pointLayer = document.querySelector("#pointLayer");
 const cursorLayer = document.querySelector("#cursorLayer");
 const statusLine = document.querySelector("#statusLine");
@@ -168,6 +204,8 @@ const state = {
   entities: [],
   freePoints: [],
   pending: [],
+  intersectionSelection: [],
+  priorityIntersections: [],
   // Ruler uses two explicit phases: choose two points for a supporting line,
   // then choose the actual segment's start and end points on that line.
   lineGuide: null,
@@ -187,6 +225,10 @@ const state = {
 };
 
 const toolCopy = {
+  bisector: { titleKey: "tool.bisector.title", helperKey: "statusBisector" },
+  perpendicular: { titleKey: "tool.perpendicular.title", helperKey: "statusPerpendicular" },
+  angleBisector: { titleKey: "tool.angleBisector.title", helperKey: "statusAngleFirst" },
+  intersections: { titleKey: "tool.intersections.title", helperKey: "statusIntersectionFirst" },
   select: {
     titleKey: "tool.select.title",
     helperKey: "helperSelect",
@@ -611,6 +653,10 @@ function updateStatus() {
 
 function currentStep() {
   const n = state.pending.length;
+  if (state.mode === "bisector") return { key: n ? "statusBisectorSecond" : "statusBisector", number: n + 1, total: 2 };
+  if (state.mode === "perpendicular") return { key: n ? "statusPerpendicularLine" : "statusPerpendicular", number: n + 1, total: 2 };
+  if (state.mode === "angleBisector") return { key: ["statusAngleFirst", "statusAngleVertex", "statusAngleLast"][n], number: n + 1, total: 3 };
+  if (state.mode === "intersections") return { key: state.intersectionSelection.length ? "statusIntersectionSecond" : state.priorityIntersections.length ? "helperIntersectionReady" : "statusIntersectionFirst", number: state.intersectionSelection.length || state.priorityIntersections.length ? 2 : 1, total: 2 };
   if (state.mode === "bold") return { key: "helperBold", number: 1, total: 1 };
   if (state.mode === "lineQuick") return { key: n ? "statusLineQuickSecond" : "statusLineQuick", number: n + 1, total: 2 };
   if (state.mode === "arcThreePoint") return { key: ["statusArcThreePoint", "statusArcThreeCenter", "statusArcThreeStart"][n], number: n + 1, total: 3 };
@@ -660,7 +706,7 @@ function updateCompassStateUI() {
     label = t("stateSetting");
     hint = t("stateSettingHint");
     live = t("liveSetting");
-  } else if (state.mode === "line" || state.mode === "lineQuick") {
+  } else if (["line", "lineQuick", "bisector", "perpendicular", "angleBisector"].includes(state.mode)) {
     cardState = state.radiusReady ? "held" : "idle";
     label = t("stateRuler");
     hint = state.radiusReady ? t("stateRulerHint", { radius: Math.round(state.radius) }) : t("noCompassRadius");
@@ -706,7 +752,19 @@ function clearOperationPoints() {
   state.operationPoints = [];
 }
 
+function prioritySnap(point, eligible = () => true) {
+  let closest = null;
+  let best = 14 / state.scale;
+  for (const candidate of state.priorityIntersections) {
+    const d = distance(point, candidate);
+    if (eligible(candidate) && d < best) { best = d; closest = candidate; }
+  }
+  return closest ? clonePoint(closest) : null;
+}
+
 function getSnap(point) {
+  const priority = prioritySnap(point);
+  if (priority) return priority;
   const tolerance = 14 / state.scale;
   let closest = null;
   let best = tolerance;
@@ -729,6 +787,8 @@ function setMode(mode, record = true) {
   state.mode = mode;
   state.radiusPicking = mode === "radius";
   state.pending = [];
+  state.intersectionSelection = [];
+  if (mode === "intersections") state.priorityIntersections = [];
   state.lineGuide = null;
   state.previewPoint = null;
   state.selectedPoint = null;
@@ -750,7 +810,7 @@ function pushHistory() {
   if (state.history.length > 30) state.history.shift();
 }
 
-function commitEntity(entity) {
+function commitEntity(entity, construction = null) {
   pushHistory();
   const method = state.mode;
   const alignment = method === "line" ? state.pending.slice(0, 2).map(clonePoint) : [];
@@ -779,7 +839,7 @@ function commitEntity(entity) {
   render();
   const entityKey = entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc";
   setStatus("statusEntityDone", { entityKey });
-  recordConstruction("draw", { tool: method, geometry: entity, alignment });
+  recordConstruction("draw", { tool: method, geometry: entity, alignment, ...(construction ? { construction } : {}) });
 }
 
 function pointOnRadius(center, clickPoint, radius = state.radius) {
@@ -814,6 +874,8 @@ function projectToLine(point, guide) {
 
 function lineGuidePoint(rawPoint) {
   const projected = projectToLine(rawPoint, state.lineGuide);
+  const priority = prioritySnap(projected, (point) => distance(point, projectToLine(point, state.lineGuide)) <= 1e-5);
+  if (priority) return priority;
   const tolerance = 14 / state.scale;
   let closest = null;
   let best = tolerance;
@@ -827,6 +889,104 @@ function lineGuidePoint(rawPoint) {
     }
   }
   return closest ? clonePoint(closest) : projected;
+}
+
+function bisectorGeometry(a, b) {
+  if (distance(a, b) < 4) return null;
+  const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  const offset = { x: a.y - b.y, y: b.x - a.x };
+  return { type: "line", p1: { x: midpoint.x - offset.x, y: midpoint.y - offset.y }, p2: { x: midpoint.x + offset.x, y: midpoint.y + offset.y } };
+}
+
+function perpendicularGeometry(point, line) {
+  const guide = makeLineGuide(line.p1, line.p2);
+  if (!guide) return null;
+  const foot = projectToLine(point, guide);
+  const length = distance(line.p1, line.p2);
+  const offset = { x: -guide.unit.y * length / 2, y: guide.unit.x * length / 2 };
+  const geometry = distance(point, foot) > 1e-6
+    ? { type: "line", p1: clonePoint(point), p2: foot }
+    : { type: "line", p1: { x: point.x - offset.x, y: point.y - offset.y }, p2: { x: point.x + offset.x, y: point.y + offset.y } };
+  return { geometry, foot, extended: distanceToSegment(foot, line.p1, line.p2) > 1e-6 };
+}
+
+function angleBisectorGeometry(a, vertex, b) {
+  const left = distance(a, vertex), right = distance(b, vertex);
+  if (left < 4 || right < 4) return null;
+  const cross = (a.x - vertex.x) * (b.y - vertex.y) - (a.y - vertex.y) * (b.x - vertex.x);
+  if (Math.abs(cross) / (left * right) < 1e-6) return null;
+  // Equal unit vectors bisect the angle; extend beyond the opposite side
+  // with a length of twice the longer selected arm.
+  const direction = { x: (a.x - vertex.x) / left + (b.x - vertex.x) / right, y: (a.y - vertex.y) / left + (b.y - vertex.y) / right };
+  const extent = 2 * Math.max(left, right) / Math.hypot(direction.x, direction.y);
+  const end = { x: vertex.x + direction.x * extent, y: vertex.y + direction.y * extent };
+  return { type: "line", p1: clonePoint(vertex), p2: end };
+}
+
+function originalConstruction(entity) {
+  if (!entity) return null;
+  const original = entity.constructionId && constructionHistory?.project.steps.find((step) => step.kind === "draw" && step.data.geometry?.constructionId === entity.constructionId)?.data.geometry;
+  return original || entity;
+}
+
+function sameConstruction(a, b) {
+  if (!a || !b) return false;
+  if (a.constructionId && b.constructionId) return a.constructionId === b.constructionId;
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function isolatedIntersections(a, b) {
+  if (a.type === "line" && b.type === "line") {
+    const guide = makeLineGuide(a.p1, a.p2);
+    if (guide && [b.p1, b.p2].every((p) => distance(p, projectToLine(p, guide)) < 1e-6)) {
+      const along = (p) => (p.x - a.p1.x) * guide.unit.x + (p.y - a.p1.y) * guide.unit.y;
+      const overlap = Math.min(distance(a.p1, a.p2), Math.max(along(b.p1), along(b.p2))) - Math.max(0, Math.min(along(b.p1), along(b.p2)));
+      if (overlap > 1e-6) return [];
+    }
+  } else if (a.type !== "line" && b.type !== "line" && distance(a.center, b.center) < 1e-6 && Math.abs(a.radius - b.radius) < 1e-6) {
+    const intervals = (entity) => {
+      if (entity.type === "circle") return [[0, Math.PI * 2]];
+      const start = normalizeAngle(entity.sweep ? entity.a0 : entity.a1);
+      const end = start + angleDelta(entity.a0, entity.a1, entity.sweep);
+      return end > Math.PI * 2 ? [[start, Math.PI * 2], [0, end - Math.PI * 2]] : [[start, end]];
+    };
+    if (intervals(a).some(([start, end]) => intervals(b).some(([otherStart, otherEnd]) => Math.min(end, otherEnd) - Math.max(start, otherStart) > 1e-8))) return [];
+  }
+  return uniquePoints(intersectionsForPair(a, b));
+}
+
+function chooseIntersectionObject(entity) {
+  if (!entity) { setStatus("statusIntersectionMiss"); return; }
+  const object = originalConstruction(entity);
+  const first = state.intersectionSelection[0];
+  if (!first) {
+    state.priorityIntersections = [];
+    state.intersectionSelection = [JSON.parse(JSON.stringify(object))];
+    state.selectedPoint = null;
+    state.selectedEntity = null;
+    render();
+    setStatus("statusIntersectionSecond");
+    recordConstruction("objectPick", { tool: "intersections", geometry: object });
+    return;
+  }
+  if (sameConstruction(first, object)) { setStatus("statusIntersectionSame"); return; }
+  const points = isolatedIntersections(first, object);
+  if (!points.length) { setStatus("statusIntersectionNone"); return; }
+  state.priorityIntersections = points;
+  state.intersectionSelection = [];
+  render();
+  setStatus("statusIntersectionReady", { count: points.length });
+  recordConstruction("intersection", { tool: "intersections", objects: [first, object], points });
+}
+
+function choosePerpendicularLine(entity) {
+  if (!entity || entity.type !== "line") { setStatus("statusPerpendicularMiss"); return; }
+  const line = originalConstruction(entity);
+  const point = state.pending[0];
+  const result = perpendicularGeometry(point, line);
+  if (!result) { setStatus("statusPerpendicularMiss"); return; }
+  commitEntity(result.geometry, { kind: "perpendicular", points: [clonePoint(point)], objects: [line] });
+  if (result.extended) setStatus("statusPerpendicularExtended");
 }
 
 function handleCanvasClick(rawPoint) {
@@ -846,13 +1006,42 @@ function performCanvasClick(rawPoint) {
   let point = getSnap(rawPoint);
   state.previewPoint = point;
   state.pointer = { ...rawPoint, inside: true };
+  if (state.mode === "intersections") {
+    const first = state.intersectionSelection[0];
+    const candidate = nearestEntity(rawPoint, (entity) => !sameConstruction(first, originalConstruction(entity)));
+    chooseIntersectionObject(candidate || nearestEntity(rawPoint));
+    return;
+  }
+  if (state.mode === "perpendicular" && state.pending.length) {
+    choosePerpendicularLine(nearestEntity(rawPoint, (entity) => entity.type === "line"));
+    return;
+  }
+  if (["bisector", "perpendicular", "angleBisector"].includes(state.mode)) {
+    const points = [...state.pending, point];
+    const needed = state.mode === "bisector" ? 2 : 3;
+    if (state.mode === "perpendicular" || points.length < needed) {
+      if (state.pending.length && distance(state.pending[0], point) < 4) { setStatus("statusTooClose"); return; }
+      state.pending.push(clonePoint(point));
+      addOperationPoint(point);
+      state.selectedPoint = clonePoint(point);
+      render();
+      setStatus(currentStep().key);
+    } else {
+      const geometry = state.mode === "bisector" ? bisectorGeometry(...points) : angleBisectorGeometry(...points);
+      if (!geometry) { setStatus(state.mode === "bisector" ? "statusTooClose" : "statusAngleInvalid"); return; }
+      addOperationPoint(point);
+      commitEntity(geometry, { kind: state.mode, points: points.map(clonePoint), objects: [] });
+    }
+    return;
+  }
   if (state.mode === "bold" || state.mode === "select") {
     const entity = nearestEntity(rawPoint);
+    const priority = state.mode === "select" && prioritySnap(rawPoint);
     const standalone = state.mode === "select" && pointKinds().find((item) => item.isStandalone
       && distance(rawPoint, item.point) <= 6 / state.scale
       && (!entity || distance(rawPoint, item.point) < distanceToEntity(rawPoint, entity)));
-    if (standalone) point = clonePoint(standalone.point);
-    if (entity && !standalone) {
+    if (standalone && !priority) point = clonePoint(standalone.point);
+    if (entity && !standalone && !priority) {
       selectEntity(entity);
       return;
     }
@@ -1045,10 +1234,11 @@ function distanceToEntity(point, entity) {
   return Math.min(distance(point, entity.start), distance(point, entity.end));
 }
 
-function nearestEntity(point) {
+function nearestEntity(point, eligible = () => true) {
   let nearest = null;
   let best = 10 / state.scale;
   for (const entity of state.entities) {
+    if (!eligible(entity)) continue;
     const d = distanceToEntity(point, entity);
     if (d < best) {
       nearest = entity;
@@ -1080,6 +1270,13 @@ function renderGeometryPiece(entity, node, hit, layer) {
   // This also keeps pan gestures working when they start on a line or a point.
   group.addEventListener("keydown", (event) => {
     if (event.key !== "Enter") return;
+    if (!editingBlocked() && (state.mode === "intersections" || (state.mode === "perpendicular" && state.pending.length))) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (state.mode === "intersections") chooseIntersectionObject(entity);
+      else choosePerpendicularLine(entity);
+      return;
+    }
     if (state.mode !== "select" && state.mode !== "bold") return;
     event.preventDefault();
     event.stopPropagation();
@@ -1113,8 +1310,61 @@ function renderArc(entity, layer) {
   renderGeometryPiece(entity, node, hit, layer);
 }
 
+function renderQuickObject(entity, className = "quick-object-highlight") {
+  if (!entity) return;
+  let node;
+  if (entity.type === "line") node = el("line", { x1: entity.p1.x, y1: entity.p1.y, x2: entity.p2.x, y2: entity.p2.y, class: className });
+  else if (entity.type === "circle") node = el("circle", { cx: entity.center.x, cy: entity.center.y, r: entity.radius, class: className });
+  else node = el("path", { d: arcPath(entity), class: className });
+  quickOverlayLayer.appendChild(node);
+}
+
+function renderQuickPreview() {
+  const pending = state.pending;
+  const cursor = state.pointer.inside ? state.previewPoint : null;
+  if (state.mode === "intersections") {
+    const first = state.intersectionSelection[0];
+    renderQuickObject(first);
+    const hovered = state.pointer.inside && nearestEntity(state.pointer, (entity) => !sameConstruction(first, originalConstruction(entity)));
+    if (hovered) renderQuickObject(originalConstruction(hovered));
+    return true;
+  }
+  if (!["bisector", "perpendicular", "angleBisector"].includes(state.mode)) return false;
+  let geometry = null;
+  if (state.mode === "bisector" && pending.length && cursor) {
+    renderQuickObject({ type: "line", p1: pending[0], p2: cursor }, "reference-line");
+    geometry = bisectorGeometry(pending[0], cursor);
+  }
+  if (state.mode === "perpendicular" && pending.length && cursor) {
+    const line = originalConstruction(nearestEntity(state.pointer, (entity) => entity.type === "line"));
+    if (line) {
+      renderQuickObject(line);
+      const result = perpendicularGeometry(pending[0], line);
+      geometry = result?.geometry;
+      if (result) {
+        quickOverlayLayer.appendChild(el("circle", { cx: result.foot.x, cy: result.foot.y, r: 5 / state.scale, class: "reference-point" }));
+        if (result.extended) renderQuickObject({ type: "line", p1: distance(line.p1, result.foot) < distance(line.p2, result.foot) ? line.p1 : line.p2, p2: result.foot }, "reference-line");
+      }
+    }
+  }
+  if (state.mode === "angleBisector" && pending.length) {
+    if (pending.length === 1 && cursor) renderQuickObject({ type: "line", p1: pending[0], p2: cursor }, "reference-line");
+    if (pending.length === 2) {
+      renderQuickObject({ type: "line", p1: pending[0], p2: pending[1] }, "reference-line");
+      if (cursor) {
+        renderQuickObject({ type: "line", p1: pending[1], p2: cursor }, "reference-line");
+        geometry = angleBisectorGeometry(pending[0], pending[1], cursor);
+      }
+    }
+  }
+  if (geometry) renderQuickObject(geometry, "quick-construction-preview");
+  return true;
+}
+
 function renderPreview() {
   referenceLayer.replaceChildren();
+  quickOverlayLayer.replaceChildren();
+  if (renderQuickPreview()) return;
   const pending = state.pending;
   if (state.mode === "lineQuick") {
     if (state.pointer.inside && state.previewPoint && pending.length === 1) {
@@ -1221,6 +1471,10 @@ function renderPoints() {
     });
     pointLayer.appendChild(node);
   }
+  state.priorityIntersections.forEach((point, index) => {
+    pointLayer.appendChild(el("circle", { cx: point.x, cy: point.y, r: 7 / state.scale, class: "priority-intersection" }));
+    pointLayer.appendChild(el("text", { x: point.x + 11 / state.scale, y: point.y - 11 / state.scale, "font-size": 12 / state.scale, class: "priority-intersection-label" }, `I${index + 1}`));
+  });
   pointCount.innerHTML = `${pointKinds().length} <span>${t("points")}</span>`;
 }
 
@@ -1260,6 +1514,9 @@ function resetView() {
   state.panY = 0;
   state.scale = 1;
   updateTransform();
+  renderPoints();
+  renderPreview();
+  if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
   constructionHistory?.viewChanged();
 }
 
@@ -1279,6 +1536,8 @@ function undo() {
   state.lastArc = previous.lastArc || null;
   state.quickRadiusSource = null;
   state.pendingOrigins = [];
+  state.intersectionSelection = [];
+  state.priorityIntersections = [];
   state.radiusPicking = state.mode === "radius" && !state.radiusReady;
   state.pending = [];
   state.lineGuide = null;
@@ -1304,6 +1563,8 @@ function clearBoard() {
   state.operationPoints = [];
   state.quickRadiusSource = null;
   state.pendingOrigins = [];
+  state.intersectionSelection = [];
+  state.priorityIntersections = [];
   render();
   setStatus("statusClear");
   recordConstruction("clear");
@@ -1396,6 +1657,7 @@ document.querySelector("#resetViewBtn").addEventListener("click", resetView);
 document.querySelector("#zoomInBtn").addEventListener("click", () => {
   state.scale = Math.min(3.5, state.scale * 1.15);
   updateTransform();
+  renderPoints();
   renderPreview();
   constructionHistory?.viewChanged();
   if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
@@ -1403,6 +1665,7 @@ document.querySelector("#zoomInBtn").addEventListener("click", () => {
 document.querySelector("#zoomOutBtn").addEventListener("click", () => {
   state.scale = Math.max(0.35, state.scale / 1.15);
   updateTransform();
+  renderPoints();
   renderPreview();
   constructionHistory?.viewChanged();
   if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
@@ -1424,7 +1687,8 @@ board.addEventListener("pointermove", (event) => {
     state.previewPoint = getSnap(state.pointer);
     renderPreview();
   }
-  cursorLayer.setAttribute("transform", `translate(${state.pointer.x} ${state.pointer.y})`);
+  const cursor = prioritySnap(state.pointer) || state.pointer;
+  cursorLayer.setAttribute("transform", `translate(${cursor.x} ${cursor.y})`);
 });
 board.addEventListener("pointerleave", () => {
   if (editingBlocked()) return;
@@ -1466,6 +1730,7 @@ board.addEventListener("wheel", (event) => {
   state.panX = svgPoint.x - before.x * state.scale;
   state.panY = svgPoint.y - before.y * state.scale;
   updateTransform();
+  renderPoints();
   renderPreview();
   constructionHistory?.viewChanged();
   if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
@@ -1489,7 +1754,7 @@ document.addEventListener("keydown", (event) => {
     undo();
   }
   if (event.key === "Escape") {
-    const canceled = state.pending.length > 0 || state.operationPoints.length > 0;
+    const canceled = state.pending.length > 0 || state.operationPoints.length > 0 || state.intersectionSelection.length > 0 || state.priorityIntersections.length > 0;
     clearOperationPoints();
     state.pending = [];
     state.lineGuide = null;
@@ -1498,12 +1763,14 @@ document.addEventListener("keydown", (event) => {
     state.selectedEntity = null;
     state.quickRadiusSource = null;
     state.pendingOrigins = [];
+    state.intersectionSelection = [];
+    state.priorityIntersections = [];
     render();
     setStatus("statusCanceled");
     if (canceled) recordConstruction("cancel");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
-    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint" }[event.key.toLowerCase()];
+    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint", m: "bisector", p: "perpendicular", g: "angleBisector", i: "intersections" }[event.key.toLowerCase()];
     if (shortcut && event.target.tagName !== "INPUT") setMode(shortcut);
   }
 });
