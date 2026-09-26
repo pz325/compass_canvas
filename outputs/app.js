@@ -17,7 +17,9 @@ const translations = {
     compassStatus: "圆规状态", currentRadius: "当前半径", freeRadius: "自由设定", apply: "应用", currentMode: "当前模式：", switch: "切换 ↔",
     compassNote: "两点确定半径后，圆规会持续保持这个长度；切换直尺或重新定半径时，状态会同步更新。",
     canvasStats: "画布统计", objects: "个对象", completed: "已完成", points: "点", interactivePoints: "可交互点",
-    selectionHelp: "点线可选中；选中辅助线后可加粗为最终结果", finalize: "加粗为最终结果", shortcuts: "快捷键",
+    selectionHelp: "交点之间的每一段都可单独选中、加粗或改颜色。", finalize: "加粗为最终结果", restoreAux: "取消加粗", shortcuts: "快捷键",
+    "tool.bold.title": "加粗", "tool.bold.desc": "点击一段加粗，再点取消", helperBold: "点击一段线段或圆弧加粗；再次点击恢复为辅助线。交点之间的各段可分别操作。",
+    segmentColor: "线段颜色", resetSegmentColor: "默认", statusRestoredAux: "这一段已恢复为辅助线。", statusColorChanged: "这一段的颜色已更新。", statusColorReset: "这一段已恢复默认颜色。", statusBoldMiss: "请点击要加粗或取消加粗的线段、圆弧。", pieceInteractiveTitle: "可单独选中和加粗的线段 / 弧段",
     "tool.select.title": "选择 / 添加点", "tool.select.desc": "点击画布创建可交互点", "tool.radius.title": "定半径画弧", "tool.radius.desc": "两点量半径，再选圆心和弧端点",
     "tool.compass.title": "画弧 / 画圆", "tool.compass.desc": "圆心 → 起点 → 终点", "tool.line.title": "定向截取线段", "tool.line.desc": "两点定向，再取线段端点", "tool.line.short": "对齐两点",
     "tool.lineQuick.title": "两点画直线", "tool.lineQuick.desc": "依次点击两个点", "tool.arcThreePoint.title": "三点画弧", "tool.arcThreePoint.desc": "圆心 → 起点 → 终点",
@@ -35,12 +37,12 @@ const translations = {
     statusLineStart: "已记录线段起点，请在线上点击线段终点。", statusLineTooClose: "线段起点和终点太近，请在线上选择另一个点。",
     statusCircleCenter: "已记录圆心，点击画布完成整圆。", statusArcCenter: "已记录圆心，请点击圆周上的起点。", statusArcSame: "起点不能和圆心重合，请点在圆周方向上。",
     statusArcStart: "已记录弧起点，请点击圆周上的结束方向。", statusArcThreeStart: "已记录圆心和弧起点，请点击弧终点。", statusArcTooClose: "起点和终点方向太近，请点击另一个方向。",
-    statusEntityFinal: "已选中最终结果。", statusEntityAux: "已选中辅助线段，可点击右侧按钮加粗为最终结果。", statusNoUndo: "没有可撤销的步骤。",
+    statusEntityFinal: "已选中加粗的这一段，可取消加粗或更改颜色。", statusEntityAux: "已选中这一段，可加粗或更改颜色。", statusNoUndo: "没有可撤销的步骤。",
     statusUndo: "已撤销上一步作图。", statusClear: "画布已清空。", statusFinalized: "已将选中的辅助线段 / 弧线段加粗为最终结果。",
     statusRadiusMin: "半径至少为 10 px。", statusRadiusApplied: "半径已设为 {radius} px。", statusCanceled: "已取消当前操作，临时点也已移除。",
     entityLine: "直线段", entityCircle: "圆", entityArc: "圆弧", modeCircle: "整圆模式：请点击圆心。", modeArc: "圆弧模式：请点击圆心。",
     selectedFinal: "已是最终结果", arcCircle: "整圆", arcDraw: "画弧", pointIntersectionTitle: "交点 · 可继续点取", pointInteractiveTitle: "可交互点",
-    helperSelect: "点击任意位置创建点；点击金色交点或端点可继续用于后续作图。", helperRadius: "依次点击两个点，以两点距离作为圆规半径。也可以在左侧输入框直接设定。",
+    helperSelect: "点击线段或弧段可修改这一段的属性；点击空白处添加点。", helperRadius: "依次点击两个点，以两点距离作为圆规半径。也可以在右侧输入框直接设定。",
     helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。", helperCompassArc: "依次点击圆心、圆周上的起点和终点，按当前半径画出对应圆弧。", helperCompassCircle: "点击圆心，再点击确认整圆；使用右侧切换按钮可改为画弧。", helperLineQuick: "依次点击两个点，立即画出经过这两个点的线段。", helperArcThreePoint: "依次点击圆心、弧起点和弧终点；半径由圆心到起点的距离决定。",
     noCompassRadius: "尚未设定圆规半径。", languageToggle: "切换语言", selectedAux: "已选中辅助对象", selectedPoint: "已选点 ({x}, {y})",
     toolGroupLines: "直线", toolGroupArcs: "圆弧", reuseRadius: "使用当前半径（C）", reuseRadiusShortcut: "使用当前半径",
@@ -59,7 +61,9 @@ const translations = {
     compassStatus: "Compass status", currentRadius: "Current radius", freeRadius: "Set freely", apply: "Apply", currentMode: "Mode: ", switch: "Switch ↔",
     compassNote: "The compass keeps this radius across tools. Choose Transfer radius & arc to measure again, or reuse the held radius.",
     canvasStats: "Canvas stats", objects: "objects", completed: "completed", points: "points", interactivePoints: "interactive",
-    selectionHelp: "Select a line or arc; confirm an auxiliary guide as a final result", finalize: "Make final result", shortcuts: "Shortcuts",
+    selectionHelp: "Select each piece between intersections to change its emphasis or color.", finalize: "Make final result", restoreAux: "Remove emphasis", shortcuts: "Shortcuts",
+    "tool.bold.title": "Emphasize", "tool.bold.desc": "Click a piece to toggle emphasis", helperBold: "Click a segment or arc to emphasize it; click again to restore a guide. Each piece between intersections is independent.",
+    segmentColor: "Piece color", resetSegmentColor: "Reset", statusRestoredAux: "This piece is a construction guide again.", statusColorChanged: "This piece’s color has been updated.", statusColorReset: "This piece’s default color has been restored.", statusBoldMiss: "Click a segment or arc to toggle its emphasis.", pieceInteractiveTitle: "Individually selectable segment or arc",
     "tool.select.title": "Select / add point", "tool.select.desc": "Click the canvas to create a point", "tool.radius.title": "Transfer radius & arc", "tool.radius.desc": "Measure two points, then center & ends",
     "tool.compass.title": "Draw arc / circle", "tool.compass.desc": "Center → start → end", "tool.line.title": "Align & trim a line", "tool.line.desc": "Set direction, then choose segment ends", "tool.line.short": "Align two points",
     "tool.lineQuick.title": "Two-point line", "tool.lineQuick.desc": "Click two points in order", "tool.arcThreePoint.title": "Center–start–end arc", "tool.arcThreePoint.desc": "Center → start → end",
@@ -77,12 +81,12 @@ const translations = {
     statusLineStart: "Segment start recorded. Click the segment end on the guide line.", statusLineTooClose: "The segment is too short. Choose another point on the guide line.",
     statusCircleCenter: "Center recorded. Click the canvas to complete the circle.", statusArcCenter: "Center recorded. Click the start direction on the circle.", statusArcSame: "The start cannot overlap the center. Click toward the circle.",
     statusArcStart: "Arc start recorded. Click the end direction on the circle.", statusArcThreeStart: "Center and arc start recorded. Click the arc end.", statusArcTooClose: "Start and end directions are too close. Choose another direction.",
-    statusEntityFinal: "Final result selected.", statusEntityAux: "Auxiliary guide selected. Use the button to make it final.", statusNoUndo: "There is nothing to undo.",
+    statusEntityFinal: "Emphasized piece selected. Remove emphasis or change its color.", statusEntityAux: "Guide piece selected. Change its emphasis or color.", statusNoUndo: "There is nothing to undo.",
     statusUndo: "Last construction undone.", statusClear: "Canvas cleared.", statusFinalized: "Selected guide is now a final result.",
     statusRadiusMin: "Radius must be at least 10 px.", statusRadiusApplied: "Radius set to {radius} px.", statusCanceled: "Current operation canceled; temporary points were removed.",
     entityLine: "Segment", entityCircle: "Circle", entityArc: "Arc", modeCircle: "Circle mode: click the center.", modeArc: "Arc mode: click the center.",
     selectedFinal: "Already final", arcCircle: "Circle", arcDraw: "Draw arc", pointIntersectionTitle: "Intersection · ready to reuse", pointInteractiveTitle: "Interactive point",
-    helperSelect: "Click anywhere to create a point; click a highlighted intersection or endpoint to reuse it.", helperRadius: "Pick two points in order to use their distance as the compass radius, or enter a value on the left.",
+    helperSelect: "Click a segment or arc to edit that piece, or click empty space to add a point.", helperRadius: "Pick two points in order to use their distance as the compass radius, or enter a value on the right.",
     helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.", helperCompassArc: "Click the center, then the start and end points on the circle to draw the arc at the current radius.", helperCompassCircle: "Click the center, then click again to confirm a full circle. Use the switch to draw an arc.", helperLineQuick: "Click two points in order to immediately draw the segment between them.", helperArcThreePoint: "Click the center, arc start, and arc end; the radius comes from the center to the start.",
     noCompassRadius: "The compass radius is not set.", languageToggle: "Switch language", selectedAux: "Auxiliary object selected", selectedPoint: "Point selected ({x}, {y})",
     toolGroupLines: "Lines", toolGroupArcs: "Arcs", reuseRadius: "Use held radius (C)", reuseRadiusShortcut: "Use held radius",
@@ -132,6 +136,8 @@ const compassStateHint = document.querySelector("#compassStateHint");
 const compassLiveBadge = document.querySelector("#compassLiveBadge");
 const compassLiveLabel = document.querySelector("#compassLiveLabel");
 const finalizeBtn = document.querySelector("#finalizeBtn");
+const segmentColor = document.querySelector("#segmentColor");
+const resetSegmentColor = document.querySelector("#resetSegmentColor");
 
 const state = {
   language: initialLanguage,
@@ -166,6 +172,10 @@ const toolCopy = {
   select: {
     titleKey: "tool.select.title",
     helperKey: "helperSelect",
+  },
+  bold: {
+    titleKey: "tool.bold.title",
+    helperKey: "helperBold",
   },
   radius: {
     titleKey: "tool.radius.title",
@@ -223,7 +233,8 @@ function angleDelta(a0, a1, sweep) {
 function angleOnArc(angle, arc) {
   const total = angleDelta(arc.a0, arc.a1, arc.sweep);
   const travelled = angleDelta(arc.a0, normalizeAngle(angle), arc.sweep);
-  return travelled <= total + 1e-5;
+  const tolerance = 1e-6 / Math.max(arc.radius, 1);
+  return travelled <= total + tolerance || Math.PI * 2 - travelled <= tolerance;
 }
 
 function polar(center, radius, angle) {
@@ -324,9 +335,17 @@ function entityCircle(entity) {
 
 function intersectionsForPair(a, b) {
   const hits = [];
+  const tolerance = 1e-6;
   if (a.type === "line" && b.type === "line") {
     const hit = lineIntersection(a.p1, a.p2, b.p1, b.p2);
     if (hit) hits.push(hit);
+    else {
+      // Collinear overlaps have no single crossing; their boundaries still
+      // divide each segment into separately editable pieces.
+      for (const point of [a.p1, a.p2, b.p1, b.p2]) {
+        if (pointOnEntity(point, a, tolerance) && pointOnEntity(point, b, tolerance)) hits.push(point);
+      }
+    }
   } else if (a.type === "line" || b.type === "line") {
     const line = a.type === "line" ? a : b;
     const circular = a.type === "line" ? b : a;
@@ -336,17 +355,110 @@ function intersectionsForPair(a, b) {
   } else {
     const ca = entityCircle(a);
     const cb = entityCircle(b);
-    for (const hit of circleIntersections(ca.center, ca.radius, cb.center, cb.radius)) {
-      if ((a.type === "circle" || angleOnArc(angleOf(a.center, hit), a)) && (b.type === "circle" || angleOnArc(angleOf(b.center, hit), b))) hits.push(hit);
+    if (!ca || !cb) return [];
+    if (distance(ca.center, cb.center) <= tolerance && Math.abs(ca.radius - cb.radius) <= tolerance) {
+      const endpoints = [a, b].flatMap((entity) => entity.type === "arc"
+        ? [polar(entity.center, entity.radius, entity.a0), polar(entity.center, entity.radius, entity.a1)]
+        : []);
+      for (const point of endpoints) {
+        if (pointOnEntity(point, a, tolerance) && pointOnEntity(point, b, tolerance)) hits.push(point);
+      }
+    } else {
+      for (const hit of circleIntersections(ca.center, ca.radius, cb.center, cb.radius)) {
+        if ((a.type === "circle" || angleOnArc(angleOf(a.center, hit), a)) && (b.type === "circle" || angleOnArc(angleOf(b.center, hit), b))) hits.push(hit);
+      }
     }
   }
-  return hits;
+  return hits.filter((hit, index) => hits.findIndex((other) => distance(hit, other) <= tolerance) === index);
 }
 
-function allIntersections() {
+function splitEntityAtPoints(entity, points) {
+  const tolerance = 1e-6;
+  if (entity.type === "line") {
+    const dx = entity.p2.x - entity.p1.x;
+    const dy = entity.p2.y - entity.p1.y;
+    const length = Math.hypot(dx, dy);
+    if (length <= tolerance) return [entity];
+    const cuts = points
+      .filter((point) => pointOnEntity(point, entity, tolerance))
+      .map((point) => ((point.x - entity.p1.x) * dx + (point.y - entity.p1.y) * dy) / (length * length))
+      .filter((position) => position * length > tolerance && (1 - position) * length > tolerance)
+      .sort((a, b) => a - b);
+    const boundaries = [0];
+    for (const position of cuts) {
+      if ((position - boundaries[boundaries.length - 1]) * length > tolerance) boundaries.push(position);
+    }
+    if (boundaries.length === 1) return [entity];
+    boundaries.push(1);
+    const at = (position) => ({ x: entity.p1.x + position * dx, y: entity.p1.y + position * dy });
+    return boundaries.slice(0, -1).map((position, index) => ({
+      ...entity, p1: at(position), p2: at(boundaries[index + 1]),
+    }));
+  }
+
+  if ((entity.type !== "arc" && entity.type !== "circle") || entity.radius <= tolerance) return [entity];
+  const angularTolerance = tolerance / entity.radius;
+  const angles = points
+    .filter((point) => pointOnEntity(point, entity, tolerance))
+    .map((point) => angleOf(entity.center, point));
+  const makeArc = (a0, a1, sweep, start, end) => ({
+    ...entity,
+    ...(entity.type === "circle" ? { colorFamily: "circle" } : {}),
+    type: "arc",
+    center: clonePoint(entity.center),
+    a0, a1, sweep,
+    start: start ? clonePoint(start) : polar(entity.center, entity.radius, a0),
+    end: end ? clonePoint(end) : polar(entity.center, entity.radius, a1),
+  });
+
+  if (entity.type === "circle") {
+    const boundaries = [];
+    for (const angle of angles.sort((a, b) => a - b)) {
+      if (!boundaries.length || angle - boundaries[boundaries.length - 1] > angularTolerance) boundaries.push(angle);
+    }
+    if (boundaries.length > 1 && Math.PI * 2 - boundaries[boundaries.length - 1] + boundaries[0] <= angularTolerance) boundaries.pop();
+    // A single contact has not partitioned a closed circle into separate spans.
+    if (boundaries.length < 2) return [entity];
+    return boundaries.map((angle, index) => makeArc(angle, boundaries[(index + 1) % boundaries.length], 1));
+  }
+
+  const total = angleDelta(entity.a0, entity.a1, entity.sweep);
+  const cuts = angles
+    .map((angle) => angleDelta(entity.a0, angle, entity.sweep))
+    .filter((position) => position > angularTolerance && total - position > angularTolerance)
+    .sort((a, b) => a - b);
+  const boundaries = [0];
+  for (const position of cuts) {
+    if (position - boundaries[boundaries.length - 1] > angularTolerance) boundaries.push(position);
+  }
+  if (boundaries.length === 1) return [entity];
+  boundaries.push(total);
+  const direction = entity.sweep ? 1 : -1;
+  return boundaries.slice(0, -1).map((position, index) => makeArc(
+    index === 0 ? entity.a0 : normalizeAngle(entity.a0 + direction * position),
+    index === boundaries.length - 2 ? entity.a1 : normalizeAngle(entity.a0 + direction * boundaries[index + 1]),
+    entity.sweep,
+    index === 0 ? entity.start : null,
+    index === boundaries.length - 2 ? entity.end : null,
+  ));
+}
+
+function splitEntitiesAtIntersections(entities) {
+  const cuts = entities.map(() => []);
+  for (let i = 0; i < entities.length; i += 1) {
+    for (let j = i + 1; j < entities.length; j += 1) {
+      const hits = intersectionsForPair(entities[i], entities[j]);
+      cuts[i].push(...hits);
+      cuts[j].push(...hits);
+    }
+  }
+  return entities.flatMap((entity, index) => splitEntityAtPoints(entity, cuts[index]));
+}
+
+function allIntersections(entities = state.entities) {
   const hits = [];
-  for (let i = 0; i < state.entities.length; i += 1) {
-    for (let j = i + 1; j < state.entities.length; j += 1) hits.push(...intersectionsForPair(state.entities[i], state.entities[j]));
+  for (let i = 0; i < entities.length; i += 1) {
+    for (let j = i + 1; j < entities.length; j += 1) hits.push(...intersectionsForPair(entities[i], entities[j]));
   }
   return uniquePoints(hits);
 }
@@ -481,6 +593,7 @@ function updateStatus() {
 
 function currentStep() {
   const n = state.pending.length;
+  if (state.mode === "bold") return { key: "helperBold", number: 1, total: 1 };
   if (state.mode === "lineQuick") return { key: n ? "statusLineQuickSecond" : "statusLineQuick", number: n + 1, total: 2 };
   if (state.mode === "arcThreePoint") return { key: ["statusArcThreePoint", "statusArcThreeCenter", "statusArcThreeStart"][n], number: n + 1, total: 3 };
   if (state.mode === "line") return { key: ["statusLine", "statusLineFirst", "statusLineDirection", "statusLineStart"][n], number: n + 1, total: 4 };
@@ -496,6 +609,7 @@ function updateToolCopy() {
   const copy = toolCopy[state.mode];
   if (!copy) return;
   const step = currentStep();
+  board.setAttribute("data-mode", state.mode);
   helperLine.textContent = t(step.key);
   document.querySelector("#stepNumber").textContent = `${step.number}/${step.total}`;
   document.querySelector("#toolTitle").textContent = t(copy.titleKey);
@@ -615,10 +729,12 @@ function commitEntity(entity) {
   pushHistory();
   entity.final = false;
   state.entities.push(entity);
+  state.entities = splitEntitiesAtIntersections(state.entities);
   state.pending = [];
   state.lineGuide = null;
   state.previewPoint = null;
   state.operationPoints = [];
+  state.selectedEntity = null;
   render();
   const entityKey = entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc";
   setStatus("statusEntityDone", { entityKey });
@@ -675,6 +791,24 @@ function handleCanvasClick(rawPoint) {
   let point = getSnap(rawPoint);
   state.previewPoint = point;
   state.pointer = { ...rawPoint, inside: true };
+  if (state.mode === "bold" || state.mode === "select") {
+    const entity = nearestEntity(rawPoint);
+    const standalone = state.mode === "select" && pointKinds().find((item) => item.isStandalone
+      && distance(rawPoint, item.point) <= 6 / state.scale
+      && (!entity || distance(rawPoint, item.point) < distanceToEntity(rawPoint, entity)));
+    if (standalone) point = clonePoint(standalone.point);
+    if (entity && !standalone) {
+      selectEntity(entity);
+      return;
+    }
+    if (state.mode === "bold") {
+      state.selectedEntity = null;
+      state.selectedPoint = null;
+      render();
+      setStatus("statusBoldMiss");
+      return;
+    }
+  }
   if (state.mode === "select") {
     addOperationPoint(point);
     state.selectedPoint = point;
@@ -843,39 +977,66 @@ function entityClass(entity, baseClass) {
   return `${baseClass} ${entity.final ? "final-geometry" : "auxiliary-geometry"} ${state.selectedEntity === entity ? "selected-geometry" : ""}`;
 }
 
-function bindEntityInteraction(node, entity) {
-  node.addEventListener("pointerdown", (event) => {
-    if (state.mode === "select" && !state.spacePressed) event.stopPropagation();
-  });
-  node.addEventListener("pointerup", (event) => {
-    if (state.mode === "select" && !state.spacePressed) event.stopPropagation();
-  });
-  node.addEventListener("click", (event) => {
-    if (state.mode !== "select" || state.spacePressed) return;
-    event.stopPropagation();
-    state.selectedEntity = entity;
-    state.selectedPoint = null;
+function distanceToEntity(point, entity) {
+  if (entity.type === "line") return distanceToSegment(point, entity.p1, entity.p2);
+  if (entity.type === "circle" || angleOnArc(angleOf(entity.center, point), entity)) {
+    return Math.abs(distance(point, entity.center) - entity.radius);
+  }
+  return Math.min(distance(point, entity.start), distance(point, entity.end));
+}
+
+function nearestEntity(point) {
+  let nearest = null;
+  let best = 10 / state.scale;
+  for (const entity of state.entities) {
+    const d = distanceToEntity(point, entity);
+    if (d < best) {
+      nearest = entity;
+      best = d;
+    }
+  }
+  return nearest;
+}
+
+function selectEntity(entity) {
+  state.selectedEntity = entity;
+  state.selectedPoint = null;
+  if (state.mode === "bold") {
+    finalizeSelectedEntity();
+  } else {
     render();
     setStatus(entity.final ? "statusEntityFinal" : "statusEntityAux");
+  }
+}
+
+function renderGeometryPiece(entity, node, hit, layer) {
+  const group = el("g", { class: "geometry-piece", tabindex: "0", role: "button", "aria-label": t("pieceInteractiveTitle"), "aria-pressed": String(Boolean(entity.final)) });
+  if (entity.color) group.setAttribute("style", `--geometry-color: ${entity.color}`);
+  group.appendChild(node);
+  group.appendChild(hit);
+  group.appendChild(el("title", {}, t("pieceInteractiveTitle")));
+  // Pointer events bubble to the board, which picks the nearest visible piece.
+  // This also keeps pan gestures working when they start on a line or a point.
+  group.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    if (state.mode !== "select" && state.mode !== "bold") return;
+    event.preventDefault();
+    event.stopPropagation();
+    selectEntity(entity);
   });
+  layer.appendChild(group);
 }
 
 function renderLine(entity, layer) {
   const node = el("line", { x1: entity.p1.x, y1: entity.p1.y, x2: entity.p2.x, y2: entity.p2.y, class: entityClass(entity, "geometry-line") });
-  bindEntityInteraction(node, entity);
   const hit = el("line", { x1: entity.p1.x, y1: entity.p1.y, x2: entity.p2.x, y2: entity.p2.y, class: "geometry-hit-area" });
-  bindEntityInteraction(hit, entity);
-  layer.appendChild(node);
-  layer.appendChild(hit);
+  renderGeometryPiece(entity, node, hit, layer);
 }
 
 function renderCircle(entity, layer) {
   const node = el("circle", { cx: entity.center.x, cy: entity.center.y, r: entity.radius, class: entityClass(entity, "geometry-circle") });
-  bindEntityInteraction(node, entity);
-  layer.appendChild(node);
   const hit = el("circle", { cx: entity.center.x, cy: entity.center.y, r: entity.radius, class: "geometry-hit-area" });
-  bindEntityInteraction(hit, entity);
-  layer.appendChild(hit);
+  renderGeometryPiece(entity, node, hit, layer);
 }
 
 function arcPath(entity) {
@@ -886,12 +1047,9 @@ function arcPath(entity) {
 }
 
 function renderArc(entity, layer) {
-  const node = el("path", { d: arcPath(entity), class: entityClass(entity, "geometry-arc") });
-  bindEntityInteraction(node, entity);
-  layer.appendChild(node);
+  const node = el("path", { d: arcPath(entity), class: entityClass(entity, entity.colorFamily === "circle" ? "geometry-circle" : "geometry-arc") });
   const hit = el("path", { d: arcPath(entity), class: "geometry-hit-area" });
-  bindEntityInteraction(hit, entity);
-  layer.appendChild(hit);
+  renderGeometryPiece(entity, node, hit, layer);
 }
 
 function renderPreview() {
@@ -994,9 +1152,9 @@ function renderPoints() {
     if (!isStandalone) node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hit-area" }));
     const label = el("title", {}, isIntersection ? t("pointIntersectionTitle") : t("pointInteractiveTitle"));
     node.appendChild(label);
-    node.addEventListener("pointerdown", (event) => event.stopPropagation());
-    node.addEventListener("pointerup", (event) => event.stopPropagation());
-    node.addEventListener("click", (event) => {
+    node.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
       event.stopPropagation();
       handleCanvasClick(point);
     });
@@ -1024,9 +1182,13 @@ function render() {
     selectionReadout.textContent = state.selectedPoint ? t("selectedPoint", { x: Math.round(state.selectedPoint.x), y: Math.round(state.selectedPoint.y) }) : t("noSelection");
   }
   if (finalizeBtn) {
-    finalizeBtn.disabled = !state.selectedEntity || state.selectedEntity.final;
-    finalizeBtn.textContent = state.selectedEntity?.final ? t("selectedFinal") : t("finalize");
+    finalizeBtn.disabled = !state.selectedEntity;
+    finalizeBtn.textContent = state.selectedEntity?.final ? t("restoreAux") : t("finalize");
+    finalizeBtn.setAttribute("aria-pressed", String(Boolean(state.selectedEntity?.final)));
   }
+  segmentColor.disabled = !state.selectedEntity;
+  segmentColor.value = state.selectedEntity?.color || defaultGeometryColor(state.selectedEntity);
+  resetSegmentColor.disabled = !state.selectedEntity?.color;
   updateTransform();
 }
 
@@ -1073,12 +1235,33 @@ function clearBoard() {
 }
 
 function finalizeSelectedEntity() {
-  if (!state.selectedEntity || state.selectedEntity.final) return;
+  if (!state.selectedEntity) return;
   pushHistory();
-  state.selectedEntity.final = true;
+  state.selectedEntity.final = !state.selectedEntity.final;
   render();
-  setStatus("statusFinalized");
+  setStatus(state.selectedEntity.final ? "statusFinalized" : "statusRestoredAux");
 }
+
+function defaultGeometryColor(entity) {
+  if (entity?.type === "arc" && entity.colorFamily !== "circle") return entity.final ? "#7d542a" : "#b19a78";
+  return entity?.final ? "#263d51" : "#9aa7b2";
+}
+
+segmentColor.addEventListener("change", () => {
+  if (!state.selectedEntity || !/^#[0-9a-f]{6}$/i.test(segmentColor.value)) return;
+  if (state.selectedEntity.color === segmentColor.value) return;
+  pushHistory();
+  state.selectedEntity.color = segmentColor.value;
+  render();
+  setStatus("statusColorChanged");
+});
+resetSegmentColor.addEventListener("click", () => {
+  if (!state.selectedEntity?.color) return;
+  pushHistory();
+  delete state.selectedEntity.color;
+  render();
+  setStatus("statusColorReset");
+});
 
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
 document.querySelector("#reuseRadiusBtn").addEventListener("click", () => setMode("compass"));
@@ -1210,7 +1393,7 @@ document.addEventListener("keydown", (event) => {
     setStatus("statusCanceled");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
-    const shortcut = { v: "select", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint" }[event.key.toLowerCase()];
+    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint" }[event.key.toLowerCase()];
     if (shortcut && event.target.tagName !== "INPUT") setMode(shortcut);
   }
 });

@@ -9,8 +9,8 @@
 - Select or create reusable points on the canvas.
 - Choose between two methods for drawing segments and two methods for drawing arcs (see below).
 - Keep a compass radius for repeated arcs, enter a custom radius, or switch to full-circle drawing.
-- Detect intersections between line, circle, and arc geometry. Intersections, endpoints, and centers remain interactive.
-- Keep newly constructed geometry as light guides until it is selected and confirmed as a final result.
+- Split segments, arcs, and circles at their intersections into independently selectable pieces. Intersections, endpoints, and centers remain reusable for construction.
+- Keep new pieces as light guides; use **Emphasize** (`B`) to toggle a piece between a guide and a bold final result, or select it to change its color.
 - Pan with `Space + drag`, zoom with the mouse wheel or view controls, undo with `Ctrl/⌘ + Z`, and cancel the current step with `Esc`.
 - Switch the interface between Chinese and English. Chinese is the default language.
 
@@ -29,7 +29,15 @@ Both arc methods draw the shorter arc between the chosen start and end. The end 
 
 After completing a fixed-radius arc, the compass stays ready to draw another one: click a new center, start, and end. Use **Use current radius** (`C`) to return to the held radius, or **Set radius and draw arc** (`R`) to measure a new radius. The right-hand compass panel also lets you enter a radius and switch between arcs and full circles.
 
-Use **Select / add point** (`V`) to create independent points or select completed geometry. Newly drawn segments and arcs are light construction guides; select one and choose **Make final result** to emphasize it. Only points that are not on any completed segment, arc, or circle remain visible; hidden endpoints and intersections still snap and can be reused. A circle or arc center remains visible unless another object passes through it.
+Use **Select / add point** (`V`) to create independent points or select a completed piece. Only points that are not on any completed segment, arc, or circle remain visible; hidden endpoints and intersections still snap and can be reused. A circle or arc center remains visible unless another object passes through it.
+
+## Edit individual pieces
+
+When segments and arcs intersect, each intersection divides the original geometry into separate pieces. This applies to segment–segment, segment–arc, and arc–arc intersections, including circles. A shape with no interior intersections stays as one piece.
+
+Choose **Emphasize** (`B`), then click any piece to make only that piece bold. Click it again to restore its light construction style. The tool stays active so you can mark several pieces in succession. You can also use **Select / add point** (`V`) to select a piece and use the emphasis button in the inspector.
+
+The inspector's **Piece color** control changes only the selected piece; **Reset** restores its default color. Emphasis and color are independent properties. If a later construction splits a styled piece, its new pieces inherit that emphasis and color, and you can then edit each one separately. Use `Ctrl/⌘ + Z` to undo drawing, emphasis, or color changes.
 
 ## Run locally
 
@@ -61,8 +69,8 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 - 在画布上创建和重复使用可交互点。
 - 画线段有两种方法，画圆弧也有两种方法，具体步骤见下表。
 - 保持圆规半径连续作图，也可以直接输入半径或切换整圆模式。
-- 自动计算线段、圆和圆弧的交点；交点、端点和圆心都可以继续用于作图。
-- 新对象先作为浅色辅助线显示，选中后可确认并加粗为最终结果。
+- 线段、圆和圆弧在交点处自动分割成可独立选择的片段；交点、端点和圆心都可以继续用于作图。
+- 新片段先作为浅色辅助线显示；使用「加粗」（`B`）逐段切换辅助线与最终结果，也可以选中某一段改变颜色。
 - `Space + 拖动` 平移，滚轮或视图按钮缩放，`Ctrl/⌘ + Z` 撤销，`Esc` 取消当前步骤。
 - 界面支持中文和英文切换，默认使用中文。
 
@@ -81,7 +89,15 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 
 定半径的圆弧完成后，会自动保持半径继续作图：再次点击圆心、起点、终点即可。点击右侧「使用当前半径」（`C`）可以回到当前圆规半径；重新选择「定半径画弧」（`R`）可测量新的半径。右侧圆规面板也支持直接输入半径，以及在画弧与整圆间切换。
 
-「选择 / 添加点」（`V`）可以创建孤立点或选中已画好的对象。新画的线段和圆弧作为浅色辅助线显示，选中后点击「加粗为最终结果」即可突出显示。只有没有落在已画线段、圆弧或圆上的孤立点才显示；隐藏的端点和交点仍可吸附、选择和继续作图。圆或圆弧的圆心在没有其他对象经过时保持显示。
+「选择 / 添加点」（`V`）可以创建孤立点或选中已画好的片段。只有没有落在已画线段、圆弧或圆上的孤立点才显示；隐藏的端点和交点仍可吸附、选择和继续作图。圆或圆弧的圆心在没有其他对象经过时保持显示。
+
+### 分段选择、加粗和颜色
+
+线段与线段、线段与圆弧、圆弧与圆弧相交时，会在每一个交点处分割为独立片段；整圆也参与分割。没有内部交点的线段或圆弧仍保持为一段。
+
+选择「加粗」（`B`），点击某一段即可单独加粗为最终结果；再次点击同一段，恢复浅色辅助线。加粗工具会保持开启，可以连续点击不同片段。也可以使用「选择 / 添加点」（`V`）选中片段，通过右侧按钮切换加粗状态。
+
+右侧的「线段颜色」只改变当前选中片段的颜色，「默认」恢复默认颜色；颜色与加粗状态互不影响。后续新作图再次分割已有片段时，分割后的各段继承原片段的加粗状态和颜色，然后可以分别修改。`Ctrl/⌘ + Z` 可以撤销作图、加粗和颜色修改。
 
 ### 本地运行
 

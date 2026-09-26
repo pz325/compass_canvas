@@ -30,6 +30,7 @@
           <div class="section-kicker" data-i18n="tools">工具</div>
           <div class="tool-list" role="toolbar" aria-label="选择作图工具" data-i18n-aria="toolToolbar">
             <button class="tool-item" data-mode="select" type="button"><span class="tool-icon">⌁</span><span class="tool-copy"><strong data-i18n="tool.select.title">选择 / 添加点</strong><small data-i18n="tool.select.desc">点击画布创建可交互点</small></span><span class="tool-key">V</span></button>
+            <button class="tool-item" data-mode="bold" type="button"><span class="tool-icon tool-icon-bold" aria-hidden="true">B</span><span class="tool-copy"><strong data-i18n="tool.bold.title">加粗</strong><small data-i18n="tool.bold.desc">点击一段加粗，再点取消</small></span><span class="tool-key">B</span></button>
             <div class="tool-group" role="group" aria-labelledby="lineToolsLabel">
               <div class="tool-group-title" id="lineToolsLabel" data-i18n="toolGroupLines">直线</div>
               <div class="tool-group-items">
@@ -81,8 +82,18 @@
           <button class="toggle-button" id="arcModeToggle" type="button"><span><span data-i18n="currentMode">当前模式：</span><strong id="arcModeLabel">画弧</strong></span><span data-i18n="switch">切换 ↔</span></button>
           <p class="inspector-note" data-i18n="compassNote">两点确定半径后，圆规会持续保持这个长度；切换直尺或重新定半径时，状态会同步更新。</p>
         </div>
-        <div class="inspector-section history-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="canvasStats">画布统计</span></div><div class="stats-grid"><div><strong id="entityCount">0 <span data-i18n="objects">个对象</span></strong><small data-i18n="completed">已完成</small></div><div><strong id="pointCount">0 <span data-i18n="points">点</span></strong><small data-i18n="interactivePoints">可交互点</small></div></div><div class="selection-card" id="selectionCard"><span class="selection-dot"></span><span data-i18n="selectionHelp">点线可选中；选中辅助线后可加粗为最终结果</span></div><button class="finalize-button" id="finalizeBtn" type="button" disabled data-i18n="finalize">加粗为最终结果</button></div>
-        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div></div></div>
+        <div class="inspector-section history-section">
+          <div class="inspector-heading"><span class="section-kicker" data-i18n="canvasStats">画布统计</span></div>
+          <div class="stats-grid"><div><strong id="entityCount">0 <span data-i18n="objects">个对象</span></strong><small data-i18n="completed">已完成</small></div><div><strong id="pointCount">0 <span data-i18n="points">点</span></strong><small data-i18n="interactivePoints">可交互点</small></div></div>
+          <div class="selection-card" id="selectionCard"><span class="selection-dot"></span><span data-i18n="selectionHelp">选择一段可调整颜色；使用加粗工具逐段点击加粗或取消</span></div>
+          <button class="finalize-button" id="finalizeBtn" type="button" disabled data-i18n="finalize">加粗为最终结果</button>
+          <div class="segment-color-control">
+            <label for="segmentColor" data-i18n="segmentColor">线段颜色</label>
+            <input id="segmentColor" type="color" value="#263d51" disabled />
+            <button id="resetSegmentColor" type="button" disabled data-i18n="resetSegmentColor">默认</button>
+          </div>
+        </div>
+        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.bold.title">加粗</span><kbd>B</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div></div></div>
       </aside>
     </section>
   </main>

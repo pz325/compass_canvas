@@ -70,6 +70,7 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .tool-icon { display: grid; flex: 0 0 31px; place-items: center; width: 31px; height: 31px; border-radius: 8px; color: inherit; background: rgba(255,255,255,.052); }
 .tool-item.is-active .tool-icon, .tool-item.active .tool-icon { background: rgba(230,184,108,.17); }
 .tool-icon svg { width: 18px; height: 18px; }
+.tool-icon-bold { font-size: 19px; font-weight: 800; }
 .tool-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; }
 .tool-copy strong { color: inherit; font-size: 12px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
 .tool-copy small { color: var(--ink-faint); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
@@ -140,6 +141,16 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .finalize-button { width: 100%; margin-top: 8px; border: 1px solid rgba(230,184,108,.36); border-radius: 7px; padding: 8px 9px; background: rgba(230,184,108,.12); color: var(--accent-bright); font-size: 10px; font-weight: 700; }
 .finalize-button:hover:not(:disabled) { background: rgba(230,184,108,.2); }
 .finalize-button:disabled { border-color: var(--border); background: rgba(255,255,255,.025); color: var(--ink-faint); cursor: default; opacity: .7; }
+.segment-color-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.segment-color-control label { flex: 1; min-width: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.4; }
+.segment-color-control input[type="color"] { flex: 0 0 31px; width: 31px; height: 28px; padding: 3px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface-2); cursor: pointer; }
+.segment-color-control input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.segment-color-control input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 3px; }
+.segment-color-control input[type="color"]::-moz-color-swatch { border: 0; border-radius: 3px; }
+.segment-color-control button { min-height: 28px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; background: rgba(255,255,255,.035); color: var(--ink-soft); font-size: 10px; }
+.segment-color-control button:hover:not(:disabled) { background: rgba(255,255,255,.08); color: var(--ink); }
+.segment-color-control :disabled { opacity: .4; cursor: default; }
+.segment-color-control input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .selection-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #f6cb81; box-shadow: 0 0 0 3px rgba(246,203,129,.12); }
 .canvas-empty-state.is-hidden { opacity: 0; visibility: hidden; }
 .canvas-empty-state { transition: opacity .18s ease, visibility .18s ease; }
@@ -346,3 +357,19 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 
 /* Final visual tuning: construction points stay subtle until hovered. */
 .construction-overlay .point-node > .point-visual { opacity: .12; stroke-width: 1.1; }
+
+/* A piece keeps the same weight while selected or hovered. Only emphasis
+   changes its width, and a custom color remains visible in every state. */
+.construction-overlay .geometry-line,
+.construction-overlay .geometry-circle,
+.construction-overlay .geometry-arc { pointer-events: stroke; cursor: pointer; }
+.construction-overlay .auxiliary-geometry { stroke: var(--geometry-color, #9aa7b2); stroke-width: 1.35; opacity: .62; }
+.construction-overlay .auxiliary-geometry.geometry-arc { stroke: var(--geometry-color, #b19a78); }
+.construction-overlay .final-geometry { stroke: var(--geometry-color, #263d51); stroke-width: 3.6; opacity: 1; }
+.construction-overlay .final-geometry.geometry-arc { stroke: var(--geometry-color, #7d542a); }
+.construction-overlay .selected-geometry.auxiliary-geometry { stroke: var(--geometry-color, #b16d22); stroke-width: 1.35; opacity: 1; }
+.construction-overlay .selected-geometry.final-geometry { stroke: var(--geometry-color, #85541e); stroke-width: 3.6; opacity: 1; }
+.construction-overlay .hovered-geometry,
+.construction-overlay .geometry-piece:hover > .auxiliary-geometry,
+.construction-overlay .geometry-piece:hover > .final-geometry { opacity: 1; }
+.construction-overlay[data-mode="bold"] #pointLayer * { pointer-events: none; }
