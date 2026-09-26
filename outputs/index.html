@@ -18,6 +18,11 @@
         <div><h1>CompassCanvas</h1><p data-i18n="brand.subtitle">尺规作图工作台</p></div>
       </div>
       <div class="header-actions" aria-label="编辑操作" data-i18n-aria="editActions">
+        <div class="project-actions">
+          <button class="button button-ghost button-compact" id="newProjectBtn" type="button" data-i18n="newProject">新建</button>
+          <button class="button button-ghost button-compact" id="saveProjectBtn" type="button" data-i18n="saveProject">保存</button>
+          <button class="button button-ghost button-compact" id="openProjectsBtn" type="button" data-i18n="openProjects">项目</button>
+        </div>
         <button class="button button-ghost button-compact language-toggle" id="languageToggle" type="button" aria-label="切换语言" data-i18n-title="languageToggle" data-i18n-aria="languageToggle">EN</button>
         <button class="icon-button" id="undoBtn" type="button" title="撤销（⌘/Ctrl Z）" aria-label="撤销" data-i18n-title="undo" data-i18n-aria="undo">↶</button>
         <button class="button button-ghost button-compact" id="clearBtn" type="button" data-i18n="clear">清空画布</button>
@@ -53,11 +58,14 @@
           <div class="step-card"><span class="step-number" id="stepNumber">01</span><div class="step-content"><strong id="toolTitle">选择 / 添加点</strong><p id="helperLine">点击任意位置创建点；点击交点或端点可继续作图。</p></div></div>
           <div class="tip-row"><span aria-hidden="true">✦</span><span data-i18n-html="panHint">按住 <kbd>Space</kbd> + 拖动平移；滚轮缩放</span></div>
         </div>
-        <div class="rail-footer"><span class="save-status"><i class="status-dot"></i><span data-i18n="autosave">本地自动保存</span></span><span class="save-status" data-i18n="escCancel">Esc 取消当前步骤</span></div>
+        <div class="rail-footer"><span class="save-status" data-i18n="escCancel">Esc 取消当前步骤</span></div>
       </aside>
 
       <section class="canvas-column">
-        <div class="canvas-toolbar"><div class="canvas-breadcrumb"><span class="breadcrumb-dot"></span><span data-i18n="untitled">未命名作图</span><span class="breadcrumb-muted" data-i18n="newDoc">/ 新建</span></div><div class="view-controls"><button class="view-button" id="zoomOutBtn" type="button" aria-label="缩小" data-i18n-aria="zoomOut">−</button><button class="zoom-readout" id="zoomReadout" type="button" aria-label="重置视图" data-i18n-aria="resetView">100%</button><button class="view-button" id="zoomInBtn" type="button" aria-label="放大" data-i18n-aria="zoomIn">＋</button><span class="view-divider"></span><button class="view-button" id="resetViewBtn" type="button" aria-label="重置视图" data-i18n-aria="resetView">⌗</button></div></div>
+        <div class="canvas-toolbar">
+          <div class="project-heading"><div class="canvas-breadcrumb"><span class="breadcrumb-dot"></span><input id="projectName" type="text" maxlength="100" value="未命名作图" aria-label="项目名称" data-i18n-aria="projectName" autocomplete="off" /></div><span class="save-status" id="projectSaveState" role="status" aria-live="polite"></span></div>
+          <div class="view-controls"><button class="view-button" id="zoomOutBtn" type="button" aria-label="缩小" data-i18n-aria="zoomOut">−</button><button class="zoom-readout" id="zoomReadout" type="button" aria-label="重置视图" data-i18n-aria="resetView">100%</button><button class="view-button" id="zoomInBtn" type="button" aria-label="放大" data-i18n-aria="zoomIn">＋</button><span class="view-divider"></span><button class="view-button" id="resetViewBtn" type="button" aria-label="重置视图" data-i18n-aria="resetView">⌗</button></div>
+        </div>
         <div class="canvas-frame">
           <div class="canvas-surface" id="canvasSurface" tabindex="0" role="application" aria-label="几何作图画布" data-i18n-aria="canvasSurface">
             <svg id="board" class="construction-overlay" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" aria-label="尺规作图画布" data-i18n-aria="canvasBoard">
@@ -70,15 +78,34 @@
           <div class="canvas-status" aria-live="polite"><div class="status-message"><span class="status-pulse"></span><span id="statusLine">准备就绪</span></div><div class="pointer-position" id="selectionReadout" data-i18n="noSelection">未选中点</div></div>
         </div>
         <div class="canvas-footer"><span data-i18n-html="wheelZoom"><kbd>滚轮</kbd> 缩放</span><span class="footer-divider"></span><span data-i18n-html="spacePan"><kbd>Space</kbd> + 拖动 平移</span><span class="footer-spacer"></span><span class="coordinate-readout" data-i18n="snapHint">交点自动吸附 · 所有点可继续作图</span></div>
+        <details class="construction-history" id="historyPanel" open>
+          <summary><span data-i18n="constructionHistory">作图过程</span><span class="history-count" id="historyCount">0</span></summary>
+          <div class="construction-history-content">
+            <div class="playback-workspace">
+              <div class="playback-controls">
+                <button class="playback-button playback-step" id="playbackPrev" type="button" title="上一步" aria-label="上一步" data-i18n-title="playbackPrevious" data-i18n-aria="playbackPrevious" disabled>⏮</button>
+                <button class="playback-button playback-primary" id="playbackPlay" type="button" data-i18n="playbackPlay" disabled>播放</button>
+                <button class="playback-button playback-step" id="playbackNext" type="button" title="下一步" aria-label="下一步" data-i18n-title="playbackNext" data-i18n-aria="playbackNext" disabled>⏭</button>
+                <button class="playback-button" id="playbackExit" type="button" data-i18n="playbackExit" disabled>返回编辑</button>
+                <label class="playback-speed"><span data-i18n="playbackSpeed">速度</span><select id="playbackSpeed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+              </div>
+              <div class="playback-progress"><input id="playbackProgress" type="range" min="0" max="0" step="1" value="0" aria-label="回放进度" data-i18n-aria="playbackProgress" disabled /><span id="playbackPosition">0 / 0</span></div>
+              <p class="playback-description" id="playbackDescription" data-i18n="historyEmpty">开始作图后，步骤会显示在这里。</p>
+            </div>
+            <ol class="construction-log" id="constructionLog"><li class="history-empty" data-i18n="historyEmpty">开始作图后，步骤会显示在这里。</li></ol>
+          </div>
+        </details>
       </section>
 
       <aside class="inspector" aria-label="作图信息" data-i18n-aria="inspector">
         <div class="inspector-section radius-section">
           <div class="inspector-heading"><span class="section-kicker" data-i18n="compassStatus">圆规状态</span><span class="live-badge" id="compassLiveBadge"><i></i><span id="compassLiveLabel">待设定</span></span></div>
           <div class="radius-display"><span class="radius-value" id="radiusReadout">150 px</span><span class="radius-unit" data-i18n="currentRadius">当前半径</span></div>
+          <p class="radius-source-readout" id="radiusSourceReadout"></p>
           <div class="compass-state-card" id="compassStateCard" data-state="idle"><span class="compass-state-icon">◉</span><div><strong id="compassStateLabel">圆规待设定</strong><small id="compassStateHint">先用“定半径”点取两点，或直接输入半径。</small></div></div>
           <div class="radius-editor"><label for="radiusInput" data-i18n="freeRadius">自由设定</label><div class="radius-input-row"><input id="radiusInput" type="number" min="10" max="1000" step="1" value="150" /><button id="applyRadius" type="button" data-i18n="apply">应用</button></div><input id="radiusSlider" type="range" min="20" max="300" value="150" aria-label="半径滑块" data-i18n-aria="radiusSlider" /></div>
           <button class="reuse-radius-button" id="reuseRadiusBtn" type="button" data-i18n="reuseRadius">使用当前半径（C）</button>
+          <button class="reuse-radius-button" id="reuseLastArcBtn" type="button" disabled data-i18n="reuseLastArc">沿用上一圆弧半径</button>
           <button class="toggle-button" id="arcModeToggle" type="button"><span><span data-i18n="currentMode">当前模式：</span><strong id="arcModeLabel">画弧</strong></span><span data-i18n="switch">切换 ↔</span></button>
           <p class="inspector-note" data-i18n="compassNote">两点确定半径后，圆规会持续保持这个长度；切换直尺或重新定半径时，状态会同步更新。</p>
         </div>
@@ -97,6 +124,18 @@
       </aside>
     </section>
   </main>
+  <dialog class="projects-dialog" id="projectsDialog" aria-labelledby="projectsDialogTitle">
+    <div class="projects-dialog-heading"><h2 id="projectsDialogTitle" data-i18n="savedProjects">已保存的项目</h2><button class="icon-button" id="closeProjectsBtn" type="button" aria-label="关闭项目列表" data-i18n-aria="closeProjects" data-i18n-title="closeProjects">×</button></div>
+    <ul class="saved-projects-list" id="savedProjectsList"></ul>
+    <div class="project-file-actions">
+      <button class="button button-ghost" id="importProjectBtn" type="button" data-i18n="importProject">导入项目 JSON</button>
+      <button class="button button-ghost" id="exportProjectBtn" type="button" data-i18n="exportProject">导出项目 JSON</button>
+      <button class="button button-ghost" id="exportSvgBtn" type="button" data-i18n="exportSvg">导出 SVG 图片</button>
+    </div>
+    <input id="importProjectFile" type="file" accept=".json,application/json" hidden />
+  </dialog>
+  <script src="./project-store.js"></script>
   <script src="./app.js"></script>
+  <script src="./history.js"></script>
 </body>
 </html>

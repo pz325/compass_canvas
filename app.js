@@ -49,7 +49,7 @@ const translations = {
     statusArcThreeCenter: "已记录圆心，请点击弧起点，同时确定半径。",
     stateQuickArc: "三点画弧中", stateQuickArcHint: "第二点确定本次圆弧半径；终点吸附到该圆周。",
     stateQuickArcRadiusHint: "本次圆弧半径 {radius} px；请选择圆周上的终点。",
-    heldRadius: "保留的圆规半径", quickArcRadius: "本次圆弧半径",
+    heldRadius: "保留的圆规半径", quickArcRadius: "本次圆弧半径", selectedArcRadius: "所选圆 / 弧的半径",
     editActions: "编辑操作", workspace: "尺规作图工作区", toolRail: "作图工具", toolToolbar: "选择作图工具", canvasSurface: "几何作图画布", canvasBoard: "尺规作图画布", inspector: "作图信息", radiusSlider: "半径滑块",
   },
   en: {
@@ -93,7 +93,7 @@ const translations = {
     statusArcThreeCenter: "Center recorded. Click the arc start to set its radius.",
     stateQuickArc: "Center–start–end arc", stateQuickArcHint: "The second point sets this arc’s radius; the end snaps to that circle.",
     stateQuickArcRadiusHint: "Arc radius: {radius} px. Choose the end on the circle.",
-    heldRadius: "Held compass radius", quickArcRadius: "This arc’s radius",
+    heldRadius: "Held compass radius", quickArcRadius: "This arc’s radius", selectedArcRadius: "Selected circle / arc radius",
     editActions: "Edit actions", workspace: "Straightedge and compass workspace", toolRail: "Construction tools", toolToolbar: "Choose a construction tool", canvasSurface: "Geometry construction canvas", canvasBoard: "Straightedge and compass canvas", inspector: "Construction details", radiusSlider: "Radius slider",
   },
 };
@@ -138,6 +138,20 @@ const compassLiveLabel = document.querySelector("#compassLiveLabel");
 const finalizeBtn = document.querySelector("#finalizeBtn");
 const segmentColor = document.querySelector("#segmentColor");
 const resetSegmentColor = document.querySelector("#resetSegmentColor");
+let constructionHistory = null;
+let radiusSourceSequence = 0;
+let radiusSliderEditing = false;
+
+function recordConstruction(kind, data = {}) {
+  constructionHistory?.record(kind, data);
+}
+
+function radiusSource(kind, radius, points = [], method = "manual") {
+  return { kind, radius, points: points.map((point) => constructionHistory?.pointReference(point) || clonePoint(point)), method,
+    sourceId: constructionHistory?.nextSourceId() || `radius-${++radiusSourceSequence}` };
+}
+
+function editingBlocked() { return Boolean(constructionHistory?.playback.active); }
 
 const state = {
   language: initialLanguage,
@@ -146,6 +160,10 @@ const state = {
   arcMode: "arc",
   radius: 150,
   radiusReady: false,
+  radiusSource: { kind: "free", radius: 150, points: [], method: "default", sourceId: "initial" },
+  quickRadiusSource: null,
+  pendingOrigins: [],
+  lastArc: null,
   radiusPicking: false,
   entities: [],
   freePoints: [],
@@ -665,8 +683,9 @@ function syncRadiusControls() {
   radiusSlider.value = Math.max(20, Math.min(300, state.radius));
   const quickRadius = state.mode === "arcThreePoint" && state.pending.length === 2
     ? distance(state.pending[0], state.pending[1]) : null;
-  document.querySelector("#radiusReadout").textContent = `${Math.round((quickRadius ?? state.radius) * 10) / 10} px`;
-  document.querySelector(".radius-unit").textContent = t(quickRadius !== null ? "quickArcRadius" : state.mode === "arcThreePoint" ? "heldRadius" : "currentRadius");
+  const selectedRadius = state.selectedEntity?.radius ?? null;
+  document.querySelector("#radiusReadout").textContent = `${Math.round((quickRadius ?? selectedRadius ?? state.radius) * 10) / 10} px`;
+  document.querySelector(".radius-unit").textContent = t(quickRadius !== null ? "quickArcRadius" : selectedRadius !== null ? "selectedArcRadius" : state.mode === "arcThreePoint" ? "heldRadius" : "currentRadius");
   updateCompassStateUI();
 }
 
@@ -701,10 +720,12 @@ function getSnap(point) {
   return closest ? clonePoint(closest) : clonePoint(point);
 }
 
-function setMode(mode) {
+function setMode(mode, record = true) {
+  if (editingBlocked()) return;
   // Keep intentionally added standalone points; discard incomplete geometry.
   if (state.mode !== "select") clearOperationPoints();
   if (mode === "radius") state.arcMode = "arc";
+  if (mode === "compass") state.radiusReady = true;
   state.mode = mode;
   state.radiusPicking = mode === "radius";
   state.pending = [];
@@ -713,20 +734,38 @@ function setMode(mode) {
   state.selectedPoint = null;
   state.selectedEntity = null;
   state.operationPoints = [];
+  state.quickRadiusSource = null;
+  state.pendingOrigins = [];
   updateToolCopy();
   render();
   setStatus(currentStep().key);
+  if (record) recordConstruction("tool", { tool: mode });
 }
 
 function pushHistory() {
   const committedPoints = state.mode === "select" ? state.freePoints
     : state.freePoints.filter((point) => !state.operationPoints.some((temporary) => pointNear(point, temporary, 0.01)));
-  state.history.push({ entities: JSON.parse(JSON.stringify(state.entities)), freePoints: JSON.parse(JSON.stringify(committedPoints)), radius: state.radius, radiusReady: state.radiusReady });
+  state.history.push({ entities: JSON.parse(JSON.stringify(state.entities)), freePoints: JSON.parse(JSON.stringify(committedPoints)), radius: state.radius, radiusReady: state.radiusReady,
+    radiusSource: JSON.parse(JSON.stringify(state.radiusSource)), lastArc: JSON.parse(JSON.stringify(state.lastArc)) });
   if (state.history.length > 30) state.history.shift();
 }
 
 function commitEntity(entity) {
   pushHistory();
+  const method = state.mode;
+  const alignment = method === "line" ? state.pending.slice(0, 2).map(clonePoint) : [];
+  entity.constructionId = constructionHistory?.nextStepId() || `drawing-${state.history.length}`;
+  if (entity.type !== "line") {
+    const source = method === "arcThreePoint" ? state.quickRadiusSource : state.radiusSource;
+    const origin = source?.kind === "reuse" ? source.origin : source;
+    const previousUse = constructionHistory?.project.steps.findLast((step) => step.kind === "draw" && step.data.geometry?.radiusSource?.sourceId === source?.sourceId);
+    const previousArcStep = state.lastArc?.source?.sourceId === source?.sourceId ? state.lastArc.stepId : previousUse?.id;
+    entity.radiusSource = JSON.parse(JSON.stringify(source || radiusSource("free", entity.radius)));
+    if (method !== "arcThreePoint" && previousArcStep) {
+      entity.radiusSource = { kind: "reuse", radius: entity.radius, sourceId: source.sourceId, fromStepId: previousArcStep, origin };
+    }
+    state.lastArc = { stepId: entity.constructionId, radius: entity.radius, source: JSON.parse(JSON.stringify(entity.radiusSource)) };
+  }
   entity.final = false;
   state.entities.push(entity);
   state.entities = splitEntitiesAtIntersections(state.entities);
@@ -735,9 +774,12 @@ function commitEntity(entity) {
   state.previewPoint = null;
   state.operationPoints = [];
   state.selectedEntity = null;
+  state.quickRadiusSource = null;
+  state.pendingOrigins = [];
   render();
   const entityKey = entity.type === "line" ? "entityLine" : entity.type === "circle" ? "entityCircle" : "entityArc";
   setStatus("statusEntityDone", { entityKey });
+  recordConstruction("draw", { tool: method, geometry: entity, alignment });
 }
 
 function pointOnRadius(center, clickPoint, radius = state.radius) {
@@ -788,6 +830,19 @@ function lineGuidePoint(rawPoint) {
 }
 
 function handleCanvasClick(rawPoint) {
+  if (editingBlocked()) return;
+  const tool = state.mode;
+  const stage = state.pending.length + 1;
+  const count = constructionHistory?.project.steps.length;
+  const before = JSON.stringify([state.freePoints, state.pending, state.radius, state.mode]);
+  performCanvasClick(rawPoint);
+  if (constructionHistory && count === constructionHistory.project.steps.length
+      && before !== JSON.stringify([state.freePoints, state.pending, state.radius, state.mode])) {
+    recordConstruction(tool === "select" ? "point" : "pick", { tool, stage, point: state.pending.at(-1) || state.selectedPoint || state.previewPoint, radiusSource: state.quickRadiusSource });
+  }
+}
+
+function performCanvasClick(rawPoint) {
   let point = getSnap(rawPoint);
   state.previewPoint = point;
   state.pointer = { ...rawPoint, inside: true };
@@ -833,6 +888,7 @@ function handleCanvasClick(rawPoint) {
       pushHistory();
       state.radius = radius;
       state.radiusReady = true;
+      state.radiusSource = radiusSource("points", radius, [first, point], "measure");
       addOperationPoint(point);
       state.mode = "compass";
       state.radiusPicking = false;
@@ -842,6 +898,7 @@ function handleCanvasClick(rawPoint) {
       updateToolCopy();
       syncRadiusControls();
       setStatus("statusRadiusAuto", { radius: Math.round(radius * 10) / 10 });
+      recordConstruction("radius", { radiusSource: state.radiusSource });
     }
     render();
     return;
@@ -901,6 +958,7 @@ function handleCanvasClick(rawPoint) {
 
   if (state.mode === "arcThreePoint") {
     if (state.pending.length === 0) {
+      state.pendingOrigins = [pointKinds().some((item) => pointNear(item.point, point))];
       state.pending = [point];
       addOperationPoint(point);
       setStatus("statusArcThreeCenter");
@@ -911,6 +969,8 @@ function handleCanvasClick(rawPoint) {
         setStatus("statusArcSame");
         return;
       }
+      const existingStart = pointKinds().some((item) => pointNear(item.point, point));
+      state.quickRadiusSource = radiusSource(state.pendingOrigins[0] && existingStart ? "points" : "free", radius, [center, point], "center-start");
       state.pending.push(point);
       addOperationPoint(point);
       setStatus("statusArcThreeStart");
@@ -999,6 +1059,7 @@ function nearestEntity(point) {
 }
 
 function selectEntity(entity) {
+  if (editingBlocked()) return;
   state.selectedEntity = entity;
   state.selectedPoint = null;
   if (state.mode === "bold") {
@@ -1190,6 +1251,8 @@ function render() {
   segmentColor.value = state.selectedEntity?.color || defaultGeometryColor(state.selectedEntity);
   resetSegmentColor.disabled = !state.selectedEntity?.color;
   updateTransform();
+  constructionHistory?.refresh();
+  if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
 }
 
 function resetView() {
@@ -1197,9 +1260,12 @@ function resetView() {
   state.panY = 0;
   state.scale = 1;
   updateTransform();
+  constructionHistory?.viewChanged();
 }
 
 function undo() {
+  if (editingBlocked()) return;
+  const before = constructionHistory?.captureScene();
   const previous = state.history.pop();
   if (!previous) {
     setStatus("statusNoUndo");
@@ -1209,6 +1275,10 @@ function undo() {
   state.freePoints = previous.freePoints;
   state.radius = previous.radius;
   state.radiusReady = previous.radiusReady ?? state.radiusReady;
+  state.radiusSource = previous.radiusSource || radiusSource("free", state.radius);
+  state.lastArc = previous.lastArc || null;
+  state.quickRadiusSource = null;
+  state.pendingOrigins = [];
   state.radiusPicking = state.mode === "radius" && !state.radiusReady;
   state.pending = [];
   state.lineGuide = null;
@@ -1218,9 +1288,11 @@ function undo() {
   syncRadiusControls();
   render();
   setStatus("statusUndo");
+  recordConstruction("undo", before ? { before } : {});
 }
 
 function clearBoard() {
+  if (editingBlocked()) return;
   if (!state.entities.length && !state.freePoints.length) return;
   pushHistory();
   state.entities = [];
@@ -1230,16 +1302,20 @@ function clearBoard() {
   state.selectedPoint = null;
   state.selectedEntity = null;
   state.operationPoints = [];
+  state.quickRadiusSource = null;
+  state.pendingOrigins = [];
   render();
   setStatus("statusClear");
+  recordConstruction("clear");
 }
 
 function finalizeSelectedEntity() {
-  if (!state.selectedEntity) return;
+  if (editingBlocked() || !state.selectedEntity) return;
   pushHistory();
   state.selectedEntity.final = !state.selectedEntity.final;
   render();
   setStatus(state.selectedEntity.final ? "statusFinalized" : "statusRestoredAux");
+  recordConstruction("style", { property: "final", value: state.selectedEntity.final, geometry: state.selectedEntity });
 }
 
 function defaultGeometryColor(entity) {
@@ -1248,19 +1324,21 @@ function defaultGeometryColor(entity) {
 }
 
 segmentColor.addEventListener("change", () => {
-  if (!state.selectedEntity || !/^#[0-9a-f]{6}$/i.test(segmentColor.value)) return;
+  if (editingBlocked() || !state.selectedEntity || !/^#[0-9a-f]{6}$/i.test(segmentColor.value)) return;
   if (state.selectedEntity.color === segmentColor.value) return;
   pushHistory();
   state.selectedEntity.color = segmentColor.value;
   render();
   setStatus("statusColorChanged");
+  recordConstruction("style", { property: "color", value: state.selectedEntity.color, geometry: state.selectedEntity });
 });
 resetSegmentColor.addEventListener("click", () => {
-  if (!state.selectedEntity?.color) return;
+  if (editingBlocked() || !state.selectedEntity?.color) return;
   pushHistory();
   delete state.selectedEntity.color;
   render();
   setStatus("statusColorReset");
+  recordConstruction("style", { property: "color", value: null, geometry: state.selectedEntity });
 });
 
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
@@ -1271,7 +1349,7 @@ if (languageToggle) languageToggle.addEventListener("click", () => {
   applyLanguage();
 });
 document.querySelector("#arcModeToggle").addEventListener("click", () => {
-  if (state.mode === "arcThreePoint") return;
+  if (editingBlocked() || state.mode === "arcThreePoint") return;
   if (state.mode !== "select") clearOperationPoints();
   state.arcMode = state.arcMode === "arc" ? "circle" : "arc";
   state.pending = [];
@@ -1279,6 +1357,7 @@ document.querySelector("#arcModeToggle").addEventListener("click", () => {
   setMode("compass");
 });
 document.querySelector("#applyRadius").addEventListener("click", () => {
+  if (editingBlocked()) return;
   const value = Number(radiusInput.value);
   if (!Number.isFinite(value) || value < 10) {
     setStatus("statusRadiusMin");
@@ -1288,16 +1367,27 @@ document.querySelector("#applyRadius").addEventListener("click", () => {
   if (state.mode !== "select") clearOperationPoints();
   state.radius = Math.min(1000, value);
   state.radiusReady = true;
+  state.radiusSource = radiusSource("free", state.radius, [], "manual");
   state.radiusPicking = false;
-  setMode("compass");
+  setMode("compass", false);
   setStatus("statusRadiusApplied", { radius: Math.round(state.radius * 10) / 10 });
+  recordConstruction("radius", { radiusSource: state.radiusSource });
 });
 radiusSlider.addEventListener("input", () => {
+  if (editingBlocked()) return;
+  if (!radiusSliderEditing) pushHistory();
+  radiusSliderEditing = true;
   if (state.mode !== "select") clearOperationPoints();
   state.radius = Number(radiusSlider.value);
   state.radiusReady = true;
+  state.radiusSource = radiusSource("free", state.radius, [], "slider");
   state.radiusPicking = false;
-  setMode("compass");
+  setMode("compass", false);
+});
+radiusSlider.addEventListener("change", () => {
+  if (!radiusSliderEditing || editingBlocked()) return;
+  radiusSliderEditing = false;
+  recordConstruction("radius", { radiusSource: state.radiusSource });
 });
 document.querySelector("#undoBtn").addEventListener("click", undo);
 document.querySelector("#clearBtn").addEventListener("click", clearBoard);
@@ -1307,15 +1397,20 @@ document.querySelector("#zoomInBtn").addEventListener("click", () => {
   state.scale = Math.min(3.5, state.scale * 1.15);
   updateTransform();
   renderPreview();
+  constructionHistory?.viewChanged();
+  if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
 });
 document.querySelector("#zoomOutBtn").addEventListener("click", () => {
   state.scale = Math.max(0.35, state.scale / 1.15);
   updateTransform();
   renderPreview();
+  constructionHistory?.viewChanged();
+  if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
 });
 document.querySelector("#zoomReadout").addEventListener("click", resetView);
 
 board.addEventListener("pointermove", (event) => {
+  if (editingBlocked() && !state.isPanning) return;
   const svgPoint = screenToSvg(event);
   state.pointer = { ...svgToWorld(svgPoint), inside: true };
   if (state.isPanning) {
@@ -1332,6 +1427,7 @@ board.addEventListener("pointermove", (event) => {
   cursorLayer.setAttribute("transform", `translate(${state.pointer.x} ${state.pointer.y})`);
 });
 board.addEventListener("pointerleave", () => {
+  if (editingBlocked()) return;
   state.pointer.inside = false;
   state.previewPoint = null;
   renderPreview();
@@ -1352,6 +1448,7 @@ board.addEventListener("pointerup", (event) => {
   if (state.isPanning) {
     state.isPanning = false;
     try { board.releasePointerCapture(event.pointerId); } catch (_) { /* already released */ }
+    constructionHistory?.viewChanged();
     return;
   }
   if (event.button === 0) {
@@ -1370,9 +1467,18 @@ board.addEventListener("wheel", (event) => {
   state.panY = svgPoint.y - before.y * state.scale;
   updateTransform();
   renderPreview();
+  constructionHistory?.viewChanged();
+  if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
 }, { passive: false });
 
 document.addEventListener("keydown", (event) => {
+  if (document.querySelector("#projectsDialog")?.open) return;
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName) || event.target.isContentEditable) return;
+  if (event.code === "Space" && ["BUTTON", "SUMMARY"].includes(event.target.tagName)) return;
+  if (editingBlocked() && event.key === "Escape") {
+    constructionHistory.exitPlayback();
+    return;
+  }
   if (event.code === "Space") {
     state.spacePressed = true;
     document.querySelector("#canvasSurface").classList.add("is-panning");
@@ -1383,14 +1489,18 @@ document.addEventListener("keydown", (event) => {
     undo();
   }
   if (event.key === "Escape") {
+    const canceled = state.pending.length > 0 || state.operationPoints.length > 0;
     clearOperationPoints();
     state.pending = [];
     state.lineGuide = null;
     state.previewPoint = null;
     state.selectedPoint = null;
     state.selectedEntity = null;
+    state.quickRadiusSource = null;
+    state.pendingOrigins = [];
     render();
     setStatus("statusCanceled");
+    if (canceled) recordConstruction("cancel");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
     const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint" }[event.key.toLowerCase()];

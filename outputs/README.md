@@ -13,6 +13,8 @@
 - Keep new pieces as light guides; use **Emphasize** (`B`) to toggle a piece between a guide and a bold final result, or select it to change its color.
 - Pan with `Space + drag`, zoom with the mouse wheel or view controls, undo with `Ctrl/⌘ + Z`, and cancel the current step with `Esc`.
 - Switch the interface between Chinese and English. Chinese is the default language.
+- Name and save multiple local projects; import or export the complete construction process as JSON, or export the drawing as SVG.
+- Review the construction timeline with step controls, a progress slider, and playback from 0.25× to 4×.
 
 ## Four drawing methods
 
@@ -29,6 +31,8 @@ Both arc methods draw the shorter arc between the chosen start and end. The end 
 
 After completing a fixed-radius arc, the compass stays ready to draw another one: click a new center, start, and end. Use **Use current radius** (`C`) to return to the held radius, or **Set radius and draw arc** (`R`) to measure a new radius. The right-hand compass panel also lets you enter a radius and switch between arcs and full circles.
 
+**Use last arc’s radius** copies the radius of the most recently completed arc or circle, including a three-click arc. The radius source is shown below the current value and recorded in the construction process: a direct value, two measured points, or a radius reused from an earlier construction.
+
 Use **Select / add point** (`V`) to create independent points or select a completed piece. Only points that are not on any completed segment, arc, or circle remain visible; hidden endpoints and intersections still snap and can be reused. A circle or arc center remains visible unless another object passes through it.
 
 ## Edit individual pieces
@@ -38,6 +42,14 @@ When segments and arcs intersect, each intersection divides the original geometr
 Choose **Emphasize** (`B`), then click any piece to make only that piece bold. Click it again to restore its light construction style. The tool stays active so you can mark several pieces in succession. You can also use **Select / add point** (`V`) to select a piece and use the emphasis button in the inspector.
 
 The inspector's **Piece color** control changes only the selected piece; **Reset** restores its default color. Emphasis and color are independent properties. If a later construction splits a styled piece, its new pieces inherit that emphasis and color, and you can then edit each one separately. Use `Ctrl/⌘ + Z` to undo drawing, emphasis, or color changes.
+
+## Save, share, and replay
+
+Edit the project name above the canvas. **New**, **Save**, and **Projects / export** let you keep several named projects and reopen them later. Changes are automatically saved in the current browser; the status beside the project name shows the save state.
+
+Open **Projects / export** to export the complete project as JSON or import a saved JSON file. The JSON contains the geometry, construction steps, radius sources, and piece styles, so it can be moved to another browser or shared for continued editing and playback. **Export drawing (SVG)** creates a vector image of the drawing.
+
+The **Construction history** panel below the canvas lists the recorded steps. Click a step or drag the progress slider to inspect that point in the process, use the previous/next controls to move one step at a time, or play the sequence at **0.25×, 0.5×, 1×, 2×, or 4×**. **Return to drawing** stops playback and restores the latest editable construction; playback also returns automatically when it finishes. Collapse the history panel to give the canvas more room.
 
 ## Run locally
 
@@ -55,6 +67,8 @@ Then open <http://localhost:8000/> in a browser. Opening `index.html` directly a
 index.html   Application shell and accessible UI labels
 styles.css   Layout, theme, responsive styles, and SVG appearance
 app.js       Geometry model, interaction state, rendering, and language switching
+project-store.js   Named-project storage and portable project data
+history.js   Project controls, construction timeline, playback, and exports
 outputs/     Standalone copies of the browser-ready deliverables
 ```
 
@@ -73,6 +87,8 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 - 新片段先作为浅色辅助线显示；使用「加粗」（`B`）逐段切换辅助线与最终结果，也可以选中某一段改变颜色。
 - `Space + 拖动` 平移，滚轮或视图按钮缩放，`Ctrl/⌘ + Z` 撤销，`Esc` 取消当前步骤。
 - 界面支持中文和英文切换，默认使用中文。
+- 多个本地项目可命名、保存和打开；支持用 JSON 导入、导出完整作图过程，也可以导出 SVG 图片。
+- 支持逐步查看作图过程、拖动进度，并以 0.25× 至 4× 速度回放。
 
 ### 四种画图方法
 
@@ -89,6 +105,8 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 
 定半径的圆弧完成后，会自动保持半径继续作图：再次点击圆心、起点、终点即可。点击右侧「使用当前半径」（`C`）可以回到当前圆规半径；重新选择「定半径画弧」（`R`）可测量新的半径。右侧圆规面板也支持直接输入半径，以及在画弧与整圆间切换。
 
+「沿用上一圆弧半径」可以复制最近画好的圆弧或整圆的半径，也包括三点画弧的半径。当前半径下方显示其来源，作图过程也会记录它来自直接输入、两点测量，还是某一步已画圆弧的半径。
+
 「选择 / 添加点」（`V`）可以创建孤立点或选中已画好的片段。只有没有落在已画线段、圆弧或圆上的孤立点才显示；隐藏的端点和交点仍可吸附、选择和继续作图。圆或圆弧的圆心在没有其他对象经过时保持显示。
 
 ### 分段选择、加粗和颜色
@@ -98,6 +116,14 @@ The application is intentionally dependency-free and uses SVG for the geometry b
 选择「加粗」（`B`），点击某一段即可单独加粗为最终结果；再次点击同一段，恢复浅色辅助线。加粗工具会保持开启，可以连续点击不同片段。也可以使用「选择 / 添加点」（`V`）选中片段，通过右侧按钮切换加粗状态。
 
 右侧的「线段颜色」只改变当前选中片段的颜色，「默认」恢复默认颜色；颜色与加粗状态互不影响。后续新作图再次分割已有片段时，分割后的各段继承原片段的加粗状态和颜色，然后可以分别修改。`Ctrl/⌘ + Z` 可以撤销作图、加粗和颜色修改。
+
+### 保存、分享与回放
+
+在画布上方编辑项目名称，通过「新建」「保存」「项目」管理多个项目并随时重新打开。改动会自动保存在当前浏览器中，项目名称旁显示保存状态。
+
+打开「项目」后，可以导出完整项目 JSON，或导入已有的 JSON 文件。JSON 包含几何图形、作图步骤、半径来源和各片段样式，可以用于迁移到其他浏览器、分享、继续编辑和回放。「导出 SVG 图片」则生成作图结果的矢量图片。
+
+画布下方的「作图过程」列出已记录的步骤。点击某一步或拖动进度条可以查看对应状态，也可以使用上一步、下一步逐步查看，或以 **0.25×、0.5×、1×、2×、4×** 速度播放。「返回编辑」会停止回放，并恢复到最新的可编辑作图状态。收起作图过程面板，可以为画布腾出更多空间。
 
 ### 本地运行
 
