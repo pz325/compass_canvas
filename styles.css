@@ -169,8 +169,8 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .geometry-circle,
 .construction-overlay .geometry-arc { pointer-events: all; cursor: pointer; }
 .construction-overlay .geometry-hit-area { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
-.construction-overlay .auxiliary-geometry { stroke: #9aa7b2; stroke-width: 1.35; opacity: .62; }
-.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #b19a78; }
+.construction-overlay .auxiliary-geometry { stroke: #657788; stroke-width: 1.6; opacity: .82; }
+.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #876b45; }
 .construction-overlay .final-geometry { stroke: #263d51; stroke-width: 3.6; opacity: 1; }
 .construction-overlay .final-geometry.geometry-arc { stroke: #7d542a; }
 .construction-overlay .selected-geometry { stroke: #b16d22; stroke-width: 2.8; opacity: .92; }
@@ -210,8 +210,8 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .geometry-line,
 .construction-overlay .geometry-circle,
 .construction-overlay .geometry-arc { pointer-events: all; cursor: pointer; }
-.construction-overlay .auxiliary-geometry { stroke: #9aa7b2; stroke-width: 1.35; opacity: .62; }
-.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #b19a78; }
+.construction-overlay .auxiliary-geometry { stroke: #657788; stroke-width: 1.6; opacity: .82; }
+.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #876b45; }
 .construction-overlay .final-geometry { stroke: #263d51; stroke-width: 3.6; opacity: 1; }
 .construction-overlay .final-geometry.geometry-arc { stroke: #7d542a; }
 .construction-overlay .selected-geometry { stroke: #b16d22; stroke-width: 2.8; opacity: .92; }
@@ -341,8 +341,8 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .geometry-line,
 .construction-overlay .geometry-circle,
 .construction-overlay .geometry-arc { pointer-events: all; cursor: pointer; }
-.construction-overlay .auxiliary-geometry { stroke: #9aa7b2; stroke-width: 1.35; opacity: .62; }
-.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #b19a78; }
+.construction-overlay .auxiliary-geometry { stroke: #657788; stroke-width: 1.6; opacity: .82; }
+.construction-overlay .auxiliary-geometry.geometry-arc { stroke: #876b45; }
 .construction-overlay .final-geometry { stroke: #263d51; stroke-width: 3.6; opacity: 1; }
 .construction-overlay .final-geometry.geometry-arc { stroke: #7d542a; }
 .construction-overlay .selected-geometry { stroke: #b16d22; stroke-width: 2.8; opacity: .92; }
@@ -364,12 +364,12 @@ kbd { border: 1px solid var(--border-strong); border-bottom-color: rgba(169,184,
 .construction-overlay .geometry-line,
 .construction-overlay .geometry-circle,
 .construction-overlay .geometry-arc { pointer-events: stroke; cursor: pointer; }
-.construction-overlay .auxiliary-geometry { stroke: var(--geometry-color, #9aa7b2); stroke-width: 1.35; opacity: .62; }
-.construction-overlay .auxiliary-geometry.geometry-arc { stroke: var(--geometry-color, #b19a78); }
-.construction-overlay .final-geometry { stroke: var(--geometry-color, #263d51); stroke-width: 3.6; opacity: 1; }
-.construction-overlay .final-geometry.geometry-arc { stroke: var(--geometry-color, #7d542a); }
-.construction-overlay .selected-geometry.auxiliary-geometry { stroke: var(--geometry-color, #b16d22); stroke-width: 1.35; opacity: 1; }
-.construction-overlay .selected-geometry.final-geometry { stroke: var(--geometry-color, #85541e); stroke-width: 3.6; opacity: 1; }
+.construction-overlay .auxiliary-geometry { stroke: var(--geometry-color, #657788); stroke-width: 1.6; opacity: .82; }
+.construction-overlay .auxiliary-geometry.geometry-arc { stroke: var(--geometry-color, #876b45); }
+.construction-overlay .final-geometry { stroke: var(--geometry-color, #1f3448); stroke-width: 3.8; opacity: 1; }
+.construction-overlay .final-geometry.geometry-arc { stroke: var(--geometry-color, #6f4924); }
+.construction-overlay .selected-geometry.auxiliary-geometry { stroke: var(--geometry-color, #9f5f1b); stroke-width: 1.6; opacity: 1; }
+.construction-overlay .selected-geometry.final-geometry { stroke: var(--geometry-color, #754612); stroke-width: 3.8; opacity: 1; }
 .construction-overlay .hovered-geometry,
 .construction-overlay .geometry-piece:hover > .auxiliary-geometry,
 .construction-overlay .geometry-piece:hover > .final-geometry { opacity: 1; }

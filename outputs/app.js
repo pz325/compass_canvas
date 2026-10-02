@@ -108,9 +108,11 @@ Object.assign(translations.zh, {
   "tool.perpendicular.title": "过点作垂线", "tool.perpendicular.desc": "先选点，再选线段",
   "tool.angleBisector.title": "角平分线", "tool.angleBisector.desc": "边上一点 → 顶点 → 另一边点",
   "tool.intersections.title": "精确选交点", "tool.intersections.desc": "选两个对象，优先吸附交点",
+  "tool.parallel.title": "平行线", "tool.parallel.desc": "先选线段，再选一点",
   statusBisector: "垂直中分线：请选择第一个点。", statusBisectorSecond: "请选择第二个点，直接生成垂直中分线。",
   statusPerpendicular: "过点作垂线：先选择要经过的点。", statusPerpendicularLine: "点击一条线段，将选定点连接到垂足；支持线段的延长线。",
   statusPerpendicularMiss: "请选择一条直线段。", statusPerpendicularExtended: "垂线已完成，垂足位于所选线段的延长线上。",
+  statusParallel: "平行线：请先点击一条已有线段。", statusParallelPoint: "方向线已选中，请点击一个点生成平行线。", statusParallelMiss: "请点击一条线段作为平行方向。",
   statusAngleFirst: "角平分线：先选择一条边上的点。", statusAngleVertex: "请选择角的顶点（第二个点）。", statusAngleLast: "请选择另一条边上的点，完成内角平分线。",
   statusAngleInvalid: "这三个点不能确定一个角，请选择不同且不共线的点。",
   statusIntersectionFirst: "点击第一个线段或圆弧；点击任一分段会选中原始对象。", statusIntersectionSecond: "第一个对象已高亮，请点击第二个对象。",
@@ -129,9 +131,11 @@ Object.assign(translations.en, {
   "tool.perpendicular.title": "Perpendicular through point", "tool.perpendicular.desc": "Pick a point, then a segment",
   "tool.angleBisector.title": "Angle bisector", "tool.angleBisector.desc": "Side point → vertex → other side",
   "tool.intersections.title": "Find intersections", "tool.intersections.desc": "Pick two objects to prioritize hits",
+  "tool.parallel.title": "Parallel line", "tool.parallel.desc": "Pick a line, then a point",
   statusBisector: "Perpendicular bisector: choose the first point.", statusBisectorSecond: "Choose the second point to draw the perpendicular bisector.",
   statusPerpendicular: "Perpendicular: choose the point to pass through.", statusPerpendicularLine: "Click a segment to connect the point to its perpendicular foot, including on its extension.",
   statusPerpendicularMiss: "Choose a straight segment.", statusPerpendicularExtended: "Perpendicular drawn. Its foot is on the selected segment’s extension.",
+  statusParallel: "Parallel line: click an existing segment first.", statusParallelPoint: "Direction selected. Click a point to draw the parallel segment.", statusParallelMiss: "Click a segment to use its direction.",
   statusAngleFirst: "Angle bisector: choose a point on the first side.", statusAngleVertex: "Choose the vertex of the angle (the second point).", statusAngleLast: "Choose a point on the other side to draw the internal angle bisector.",
   statusAngleInvalid: "Choose three distinct, non-collinear points to define an angle.",
   statusIntersectionFirst: "Click the first segment or arc; any split piece selects the original object.", statusIntersectionSecond: "First object highlighted. Click the second object.",
@@ -229,6 +233,7 @@ const state = {
   // Ruler uses two explicit phases: choose two points for a supporting line,
   // then choose the actual segment's start and end points on that line.
   lineGuide: null,
+  parallelLine: null,
   selectedPoint: null,
   selectedEntity: null,
   operationPoints: [],
@@ -249,6 +254,7 @@ const toolCopy = {
   circleQuick: { titleKey: "tool.circleQuick.title", helperKey: "statusCircleQuick" },
   bisector: { titleKey: "tool.bisector.title", helperKey: "statusBisector" },
   perpendicular: { titleKey: "tool.perpendicular.title", helperKey: "statusPerpendicular" },
+  parallel: { titleKey: "tool.parallel.title", helperKey: "statusParallel" },
   angleBisector: { titleKey: "tool.angleBisector.title", helperKey: "statusAngleFirst" },
   intersections: { titleKey: "tool.intersections.title", helperKey: "statusIntersectionFirst" },
   select: {
@@ -689,6 +695,7 @@ function currentStep() {
   const n = state.pending.length;
   if (state.mode === "bisector") return { key: n ? "statusBisectorSecond" : "statusBisector", number: n + 1, total: 2 };
   if (state.mode === "perpendicular") return { key: n ? "statusPerpendicularLine" : "statusPerpendicular", number: n + 1, total: 2 };
+  if (state.mode === "parallel") return { key: state.parallelLine ? "statusParallelPoint" : "statusParallel", number: state.parallelLine ? 2 : 1, total: 2 };
   if (state.mode === "angleBisector") return { key: ["statusAngleFirst", "statusAngleVertex", "statusAngleLast"][n], number: n + 1, total: 3 };
   if (state.mode === "intersections") return { key: state.intersectionSelection.length ? "statusIntersectionSecond" : state.priorityIntersections.length ? "helperIntersectionReady" : "statusIntersectionFirst", number: state.intersectionSelection.length || state.priorityIntersections.length ? 2 : 1, total: 2 };
   if (state.mode === "bold") return { key: "helperBold", number: 1, total: 1 };
@@ -747,7 +754,7 @@ function updateCompassStateUI() {
     label = t("stateSetting");
     hint = t("stateSettingHint");
     live = t("liveSetting");
-  } else if (["line", "lineQuick", "bisector", "perpendicular", "angleBisector"].includes(state.mode)) {
+  } else if (["line", "lineQuick", "bisector", "perpendicular", "parallel", "angleBisector"].includes(state.mode)) {
     cardState = state.radiusReady ? "held" : "idle";
     label = t("stateRuler");
     hint = state.radiusReady ? t("stateRulerHint", { radius: Math.round(state.radius) }) : t("noCompassRadius");
@@ -833,6 +840,7 @@ function setMode(mode, record = true) {
   state.intersectionSelection = [];
   if (mode === "intersections") state.priorityIntersections = [];
   state.lineGuide = null;
+  state.parallelLine = null;
   state.previewPoint = null;
   state.selectedPoint = null;
   state.selectedEntity = null;
@@ -874,6 +882,7 @@ function commitEntity(entity, construction = null) {
   state.entities = splitEntitiesAtIntersections(state.entities);
   state.pending = [];
   state.lineGuide = null;
+  state.parallelLine = null;
   state.previewPoint = null;
   state.operationPoints = [];
   state.selectedEntity = null;
@@ -1032,6 +1041,28 @@ function choosePerpendicularLine(entity) {
   if (result.extended) setStatus("statusPerpendicularExtended");
 }
 
+function parallelGeometry(point, line) {
+  const guide = line?.type === "line" ? makeLineGuide(line.p1, line.p2) : null;
+  if (!guide) return null;
+  const half = distance(line.p1, line.p2) / 2;
+  return {
+    type: "line",
+    p1: { x: point.x - guide.unit.x * half, y: point.y - guide.unit.y * half },
+    p2: { x: point.x + guide.unit.x * half, y: point.y + guide.unit.y * half },
+  };
+}
+
+function chooseParallelLine(entity) {
+  if (!entity || entity.type !== "line") { setStatus("statusParallelMiss"); return; }
+  state.parallelLine = originalConstruction(entity);
+  state.pending = [];
+  state.selectedPoint = null;
+  state.selectedEntity = null;
+  render();
+  setStatus("statusParallelPoint");
+  recordConstruction("objectPick", { tool: "parallel", geometry: state.parallelLine });
+}
+
 function handleCanvasClick(rawPoint) {
   if (editingBlocked()) return;
   const tool = state.mode;
@@ -1057,6 +1088,17 @@ function performCanvasClick(rawPoint) {
   }
   if (state.mode === "perpendicular" && state.pending.length) {
     choosePerpendicularLine(nearestEntity(rawPoint, (entity) => entity.type === "line"));
+    return;
+  }
+  if (state.mode === "parallel") {
+    if (!state.parallelLine) {
+      chooseParallelLine(nearestEntity(rawPoint, (entity) => entity.type === "line"));
+      return;
+    }
+    const geometry = parallelGeometry(point, state.parallelLine);
+    if (!geometry) { setStatus("statusParallelMiss"); return; }
+    addOperationPoint(point);
+    commitEntity(geometry, { kind: "parallel", points: [clonePoint(point)], objects: [state.parallelLine] });
     return;
   }
   if (["bisector", "perpendicular", "angleBisector"].includes(state.mode)) {
@@ -1332,10 +1374,11 @@ function renderGeometryPiece(entity, node, hit, layer) {
   // This also keeps pan gestures working when they start on a line or a point.
   group.addEventListener("keydown", (event) => {
     if (event.key !== "Enter") return;
-    if (!editingBlocked() && (state.mode === "intersections" || (state.mode === "perpendicular" && state.pending.length))) {
+    if (!editingBlocked() && (state.mode === "intersections" || (state.mode === "parallel" && !state.parallelLine) || (state.mode === "perpendicular" && state.pending.length))) {
       event.preventDefault();
       event.stopPropagation();
       if (state.mode === "intersections") chooseIntersectionObject(entity);
+      else if (state.mode === "parallel") chooseParallelLine(entity);
       else choosePerpendicularLine(entity);
       return;
     }
@@ -1389,6 +1432,20 @@ function renderQuickPreview() {
     renderQuickObject(first);
     const hovered = state.pointer.inside && nearestEntity(state.pointer, (entity) => !sameConstruction(first, originalConstruction(entity)));
     if (hovered) renderQuickObject(originalConstruction(hovered));
+    return true;
+  }
+  if (state.mode === "parallel") {
+    const source = state.parallelLine;
+    if (!source) {
+      const hovered = state.pointer.inside && nearestEntity(state.pointer, (entity) => entity.type === "line");
+      if (hovered) renderQuickObject(originalConstruction(hovered));
+      return true;
+    }
+    renderQuickObject(source);
+    if (cursor) {
+      const geometry = parallelGeometry(cursor, source);
+      if (geometry) renderQuickObject(geometry, "quick-construction-preview");
+    }
     return true;
   }
   if (!["bisector", "perpendicular", "angleBisector"].includes(state.mode)) return false;
@@ -1647,7 +1704,7 @@ function loadClassicCase(id) {
   state.classicCase = Object.fromEntries(["id", "titleEn", "titleZh", "descriptionEn", "descriptionZh", "sourceUrl", "source"].map((key) => [key, item[key] || ""]));
   state.entities = splitEntitiesAtIntersections(scene.entities);
   state.freePoints = scene.freePoints;
-  state.pending = []; state.operationPoints = []; state.lineGuide = null;
+  state.pending = []; state.operationPoints = []; state.lineGuide = null; state.parallelLine = null;
   state.intersectionSelection = []; state.priorityIntersections = [];
   state.selectedPoint = null; state.selectedEntity = null; state.previewPoint = null; state.history = [];
   state.radius = 150; state.radiusReady = false;
@@ -1720,6 +1777,7 @@ function undo() {
   state.radiusPicking = state.mode === "radius" && !state.radiusReady;
   state.pending = [];
   state.lineGuide = null;
+  state.parallelLine = null;
   state.operationPoints = [];
   state.selectedPoint = null;
   state.selectedEntity = null;
@@ -1737,6 +1795,7 @@ function clearBoard() {
   state.freePoints = [];
   state.pending = [];
   state.lineGuide = null;
+  state.parallelLine = null;
   state.selectedPoint = null;
   state.selectedEntity = null;
   state.operationPoints = [];
@@ -1759,8 +1818,8 @@ function finalizeSelectedEntity() {
 }
 
 function defaultGeometryColor(entity) {
-  if (entity?.type === "arc" && entity.colorFamily !== "circle") return entity.final ? "#7d542a" : "#b19a78";
-  return entity?.final ? "#263d51" : "#9aa7b2";
+  if (entity?.type === "arc" && entity.colorFamily !== "circle") return entity.final ? "#6f4924" : "#876b45";
+  return entity?.final ? "#1f3448" : "#657788";
 }
 
 segmentColor.addEventListener("change", () => {
@@ -1938,10 +1997,11 @@ document.addEventListener("keydown", (event) => {
     undo();
   }
   if (event.key === "Escape") {
-    const canceled = state.pending.length > 0 || state.operationPoints.length > 0 || state.intersectionSelection.length > 0 || state.priorityIntersections.length > 0;
+    const canceled = state.pending.length > 0 || state.operationPoints.length > 0 || state.parallelLine || state.intersectionSelection.length > 0 || state.priorityIntersections.length > 0;
     clearOperationPoints();
     state.pending = [];
     state.lineGuide = null;
+    state.parallelLine = null;
     state.previewPoint = null;
     state.selectedPoint = null;
     state.selectedEntity = null;
@@ -1954,7 +2014,7 @@ document.addEventListener("keydown", (event) => {
     if (canceled) recordConstruction("cancel");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
-    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint", o: "circleQuick", m: "bisector", p: "perpendicular", g: "angleBisector", i: "intersections" }[event.key.toLowerCase()];
+    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint", o: "circleQuick", m: "bisector", p: "perpendicular", n: "parallel", g: "angleBisector", i: "intersections" }[event.key.toLowerCase()];
     if (shortcut && event.target.tagName !== "INPUT") setMode(shortcut);
   }
 });

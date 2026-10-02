@@ -7,8 +7,8 @@ Object.assign(translations.zh, {
   reuseLastArc: "沿用上一圆弧半径", saved: "已保存到本机", saving: "正在保存…", saveFailed: "未能保存到本机，请导出任务", noSavedProjects: "还没有已保存的任务。", invalidProject: "任务文件无效或版本不兼容，当前作图未改变。", projectImported: "任务已导入，可以继续作图或回放。", projectOpened: "任务已打开。", projectSaved: "任务及完整过程已保存。", projectNew: "新任务已创建。", playbackStart: "初始画布", playbackFinished: "回放完成；点击“返回作图”继续编辑。", playbackDone: "回放完成，可以继续作图。", playbackViewing: "正在回看第 {index} 步；点击“返回作图”继续编辑。", projectExported: "已导出完整任务，包含图形、过程和半径来源。", svgExported: "已导出 SVG 图形。",
   journalTool: "选择工具：{tool}", journalPoint: "添加点 {point}", journalPick: "{tool} · 第 {stage} 次取点：{point}", journalRadius: "设定半径：{source}", journalDraw: "绘制{shape}：{points}", journalAlign: "对齐 {points}；", journalStyleFinal: "将这一段加粗", journalStyleAux: "取消这一段的加粗", journalStyleColor: "将这一段颜色改为 {color}", journalStyleReset: "恢复这一段的默认颜色", journalUndo: "撤销上一步，恢复此前图形", journalCancel: "取消当前作图，移除临时点", journalClear: "清空画布", journalSteps: "{count} 步",
   radiusFreeSource: "自由取半径 {radius} px", radiusPointsSource: "取 {points} 间的距离：{radius} px", radiusReuseSource: "沿用第 {step} 步圆弧半径：{radius} px", radiusUnknownStep: "此前", radiusSourceLabel: "半径来源：{source}", radiusFreeAnchors: "（圆心 / 起点：{points}）",
-  journalObjectPick: "选择求交对象：{object}", journalIntersection: "求交：{objects}；交点 {points}", journalObjectStep: "第 {step} 步的{shape}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape}（{points}）",
-  journalBisector: "作 {points} 的垂直平分线；", journalPerpendicular: "过 {point} 作{object}的垂线；", journalAngleBisector: "平分角 {points}；",
+  journalObjectPick: "选择求交对象：{object}", journalParallelSource: "选择平行方向线：{object}", journalIntersection: "求交：{objects}；交点 {points}", journalObjectStep: "第 {step} 步的{shape}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape}（{points}）",
+  journalBisector: "作 {points} 的垂直平分线；", journalPerpendicular: "过 {point} 作{object}的垂线；", journalParallel: "过 {point} 作与{object}平行的线；", journalAngleBisector: "平分角 {points}；",
 });
 Object.assign(translations.en, {
   projectName: "Construction name", newProject: "New", saveProject: "Save", openProjects: "Projects / export",
@@ -17,8 +17,8 @@ Object.assign(translations.en, {
   reuseLastArc: "Use last arc’s radius", saved: "Saved on this device", saving: "Saving…", saveFailed: "Local save failed; export this project", noSavedProjects: "No saved projects yet.", invalidProject: "Invalid or incompatible project file. Your drawing has not changed.", projectImported: "Project imported. Continue drawing or replay its history.", projectOpened: "Project opened.", projectSaved: "Drawing and full history saved.", projectNew: "New project created.", playbackStart: "Initial canvas", playbackFinished: "Playback complete. Return to drawing to continue editing.", playbackDone: "Playback complete. You can continue drawing.", playbackViewing: "Viewing step {index}. Return to drawing to continue editing.", projectExported: "Full project exported with geometry, history and radius sources.", svgExported: "SVG drawing exported.",
   journalTool: "Choose tool: {tool}", journalPoint: "Add point {point}", journalPick: "{tool} · Pick {stage}: {point}", journalRadius: "Set radius: {source}", journalDraw: "Draw {shape}: {points}", journalAlign: "Align through {points}; ", journalStyleFinal: "Emphasize this piece", journalStyleAux: "Remove this piece’s emphasis", journalStyleColor: "Set this piece’s color to {color}", journalStyleReset: "Restore this piece’s default color", journalUndo: "Undo the last action and restore the preceding drawing", journalCancel: "Cancel the current construction and remove temporary points", journalClear: "Clear the canvas", journalSteps: "{count} steps",
   radiusFreeSource: "Free radius: {radius} px", radiusPointsSource: "Distance between {points}: {radius} px", radiusReuseSource: "Reuse the arc radius from step {step}: {radius} px", radiusUnknownStep: "an earlier step", radiusSourceLabel: "Radius source: {source}", radiusFreeAnchors: " (center / start: {points})",
-  journalObjectPick: "Choose intersection object: {object}", journalIntersection: "Intersect {objects}; intersection points: {points}", journalObjectStep: "{shape} from step {step}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape} ({points})",
-  journalBisector: "Construct the perpendicular bisector of {points}; ", journalPerpendicular: "Construct a perpendicular through {point} to {object}; ", journalAngleBisector: "Bisect angle {points}; ",
+  journalObjectPick: "Choose intersection object: {object}", journalParallelSource: "Choose the parallel direction line: {object}", journalIntersection: "Intersect {objects}; intersection points: {points}", journalObjectStep: "{shape} from step {step}", journalObjectId: "{shape} {id}", journalObjectCoordinates: "{shape} ({points})",
+  journalBisector: "Construct the perpendicular bisector of {points}; ", journalPerpendicular: "Construct a perpendicular through {point} to {object}; ", journalParallel: "Construct a line through {point} parallel to {object}; ", journalAngleBisector: "Bisect angle {points}; ",
 });
 translations.zh.notSaved = "新任务，尚未保存";
 translations.en.notSaved = "New project, not saved yet";
@@ -64,6 +64,7 @@ class ConstructionHistory {
     const result = {};
     for (const key of ["entities", "freePoints", "pending", "lineGuide", "radius", "radiusReady", "radiusSource", "quickRadiusSource", "pendingOrigins", "lastArc", "mode", "arcMode", "operationPoints", "selectedPoint", "panX", "panY", "scale"]) result[key] = this.clone(state[key]);
     for (const key of ["intersectionSelection", "priorityIntersections"]) result[key] = this.clone(state[key] || []);
+    if (state.parallelLine) result.parallelLine = this.clone(state.parallelLine);
     result.selectedEntityIndex = state.entities.indexOf(state.selectedEntity);
     return result;
   }
@@ -71,6 +72,7 @@ class ConstructionHistory {
   restoreScene(scene) {
     const restored = this.clone({ ...this.emptyScene, ...scene });
     for (const key of Object.keys(this.emptyScene)) if (key !== "selectedEntityIndex") state[key] = restored[key];
+    state.parallelLine = restored.parallelLine || null;
     state.selectedEntity = state.entities[restored.selectedEntityIndex] || null;
     state.radiusPicking = state.mode === "radius";
     state.pointer.inside = false;
@@ -131,6 +133,7 @@ class ConstructionHistory {
     if (!construction) return "";
     const points = construction.points.map((point) => this.pointText(point));
     if (construction.kind === "perpendicular") return t("journalPerpendicular", { point: points[0], object: this.objectText(construction.objects[0]) });
+    if (construction.kind === "parallel") return t("journalParallel", { point: points[0], object: this.objectText(construction.objects[0]) });
     return t(construction.kind === "bisector" ? "journalBisector" : "journalAngleBisector", { points: points.join(construction.kind === "bisector" ? " ↔ " : " → ") });
   }
 
@@ -144,7 +147,7 @@ class ConstructionHistory {
       return data.radiusSource ? `${pick} · ${this.sourceText(data.radiusSource)}` : pick;
     }
     if (step.kind === "radius") return t("journalRadius", { source: this.sourceText(data.radiusSource) });
-    if (step.kind === "objectPick") return t("journalObjectPick", { object: this.objectText(data.geometry) });
+    if (step.kind === "objectPick") return t(data.tool === "parallel" ? "journalParallelSource" : "journalObjectPick", { object: this.objectText(data.geometry) });
     if (step.kind === "intersection") return t("journalIntersection", { objects: data.objects.map((entity) => this.objectText(entity)).join(" ∩ "), points: data.points.map((point) => this.pointText(point)).join("; ") });
     if (step.kind === "draw") {
       const entity = data.geometry;

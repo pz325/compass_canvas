@@ -7,7 +7,7 @@
   const LIBRARY_FORMAT = "compasscanvas-library";
   const MAX_BYTES = 15 * 1024 * 1024;
   const MAX_ITEMS = 10000;
-  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint", "circleQuick", "bisector", "perpendicular", "angleBisector", "intersections"]);
+  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint", "circleQuick", "bisector", "perpendicular", "parallel", "angleBisector", "intersections"]);
   const STEP_KINDS = new Set(["tool", "point", "pick", "radius", "draw", "style", "undo", "cancel", "clear", "objectPick", "intersection"]);
   const UNSAFE_KEYS = new Set(["__proto__", "prototype", "constructor"]);
   const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
@@ -209,13 +209,13 @@
 
   function construction(value, label) {
     object(value, label);
-    const pointCounts = { bisector: 2, perpendicular: 1, angleBisector: 3 };
+    const pointCounts = { bisector: 2, perpendicular: 1, parallel: 1, angleBisector: 3 };
     if (!own(pointCounts, value.kind)) invalid(`${label} has an unsupported construction kind.`);
     array(value.points, `${label}.points`, 3);
     if (value.points.length !== pointCounts[value.kind]) invalid(`${label} has the wrong number of source points.`);
     value.points.forEach((item, index) => point(item, `${label}.points[${index}]`));
     array(value.objects, `${label}.objects`, 1);
-    if (value.objects.length !== (value.kind === "perpendicular" ? 1 : 0)) invalid(`${label} has the wrong number of source objects.`);
+    if (value.objects.length !== (["perpendicular", "parallel"].includes(value.kind) ? 1 : 0)) invalid(`${label} has the wrong number of source objects.`);
     value.objects.forEach((item, index) => {
       entity(item, `${label}.objects[${index}]`);
       if (item.type !== "line") invalid(`${label} requires a line as its source object.`);
@@ -259,6 +259,7 @@
       point(value.lineGuide.unit, `${label}.lineGuide.unit`);
       if (Math.abs(Math.hypot(value.lineGuide.unit.x, value.lineGuide.unit.y) - 1) > 1e-5) invalid(`${label}.lineGuide must have a unit direction.`);
     }
+    if (own(value, "parallelLine") && value.parallelLine !== null) entity(value.parallelLine, `${label}.parallelLine`);
     for (const key of ["radiusSource", "quickRadiusSource"]) {
       if (own(value, key) && value[key] !== null) radiusSource(value[key], `${label}.${key}`);
     }
@@ -305,7 +306,7 @@
       if (kind === "draw" && data.geometry.type !== "line") invalid(`${label} construction must produce a line.`);
     }
     if (kind === "objectPick" || kind === "intersection") {
-      if (data.tool !== "intersections") invalid(`${label} must use the intersections tool.`);
+      if (!["intersections", "parallel"].includes(data.tool)) invalid(`${label} must use the intersections or parallel tool.`);
     }
     if (kind === "intersection" || own(data, "objects")) {
       array(data.objects, `${label}.objects`, 2);
