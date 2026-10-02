@@ -57,7 +57,7 @@ class ConstructionHistory {
   createProject() {
     const now = new Date().toISOString();
     return { format: "compasscanvas-project", version: 1, id: this.uid(), title: t("untitled"), createdAt: now, updatedAt: now,
-      initialScene: this.clone(this.emptyScene), scene: this.clone(this.emptyScene), steps: [], pointCatalog: [], undoHistory: [] };
+      case: null, initialScene: this.clone(this.emptyScene), scene: this.clone(this.emptyScene), steps: [], pointCatalog: [], undoHistory: [] };
   }
 
   captureScene() {
@@ -217,13 +217,16 @@ class ConstructionHistory {
     clearTimeout(this.saveTimer);
     this.project = this.clone(project);
     this.project.pointCatalog ||= [];
+    this.project.case ||= null;
     this.project.initialScene ||= this.clone(this.emptyScene);
     this.project.undoHistory ||= [];
     this.dirty = false;
     this.savedOnce = true;
     this.listSignature = "";
     this.node("projectName").value = this.project.title;
+    state.classicCase = this.project.case ? this.clone(this.project.case) : null;
     this.restoreScene(this.project.scene);
+    updateClassicCaseBanner();
     state.history = this.clone(this.project.undoHistory);
   }
 
@@ -295,11 +298,12 @@ class ConstructionHistory {
       const previous = this.project.steps.findLast((entry) => entry.kind === "draw" && entry.data.geometry?.radiusSource?.sourceId === source?.sourceId);
       if (previous) source = { kind: "reuse", radius: state.radius, sourceId: source.sourceId, fromStepId: previous.id, origin: source };
     }
-    this.node("radiusSourceReadout").textContent = t("radiusSourceLabel", { source: this.sourceText(source) });
+    this.node("radiusSourceReadout").textContent = state.mode === "circleQuick" && state.pending.length
+      ? t("circleRadiusSourceHint") : t("radiusSourceLabel", { source: this.sourceText(source) });
     for (const selector of ["[data-mode]"]) document.querySelectorAll(selector).forEach((node) => { if (node.tagName === "BUTTON") node.disabled = playback.active; });
     for (const id of ["projectName", "radiusInput", "radiusSlider", "applyRadius", "reuseRadiusBtn"]) this.node(id).disabled = playback.active;
     this.node("reuseLastArcBtn").disabled = playback.active || !state.lastArc;
-    this.node("arcModeToggle").disabled = playback.active || state.mode === "arcThreePoint";
+    this.node("arcModeToggle").disabled = playback.active || usesOwnRadius();
     this.node("undoBtn").disabled = playback.active || !state.history.length;
     this.node("clearBtn").disabled = playback.active;
     this.node("finalizeBtn").disabled = playback.active || !state.selectedEntity;

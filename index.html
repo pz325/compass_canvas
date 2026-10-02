@@ -22,6 +22,7 @@
           <button class="button button-ghost button-compact" id="newProjectBtn" type="button" data-i18n="newProject">新建</button>
           <button class="button button-ghost button-compact" id="saveProjectBtn" type="button" data-i18n="saveProject">保存</button>
           <button class="button button-ghost button-compact" id="openProjectsBtn" type="button" data-i18n="openProjects">项目</button>
+          <button class="button button-ghost button-compact" id="classicCasesBtn" type="button" data-i18n="classicCases">经典案例</button>
         </div>
         <button class="button button-ghost button-compact language-toggle" id="languageToggle" type="button" aria-label="切换语言" data-i18n-title="languageToggle" data-i18n-aria="languageToggle">EN</button>
         <button class="icon-button" id="undoBtn" type="button" title="撤销（⌘/Ctrl Z）" aria-label="撤销" data-i18n-title="undo" data-i18n-aria="undo">↶</button>
@@ -44,8 +45,9 @@
               </div>
             </div>
             <div class="tool-group" role="group" aria-labelledby="arcToolsLabel">
-              <div class="tool-group-title" id="arcToolsLabel" data-i18n="toolGroupArcs">圆弧</div>
+              <div class="tool-group-title" id="arcToolsLabel" data-i18n="toolGroupArcs">圆与圆弧</div>
               <div class="tool-group-items">
+                <button class="tool-item" data-mode="circleQuick" type="button"><span class="tool-icon">○</span><span class="tool-copy"><strong data-i18n="tool.circleQuick.title">画圆</strong><small data-i18n="tool.circleQuick.desc">圆心 → 第二点确认半径</small></span><span class="tool-key">O</span></button>
                 <button class="tool-item" data-mode="arcThreePoint" type="button"><span class="tool-icon">⌒</span><span class="tool-copy"><strong data-i18n="tool.arcThreePoint.title">三点画弧</strong><small data-i18n="tool.arcThreePoint.desc">圆心 → 起点 → 终点</small></span><span class="tool-key">A</span></button>
                 <button class="tool-item" data-mode="radius" type="button"><span class="tool-icon">⊙</span><span class="tool-copy"><strong data-i18n="tool.radius.title">定半径画弧</strong><small data-i18n="tool.radius.desc">两点定半径，再取圆心与端点</small></span><span class="tool-key">R</span></button>
               </div>
@@ -74,6 +76,10 @@
         <div class="canvas-toolbar">
           <div class="project-heading"><div class="canvas-breadcrumb"><span class="breadcrumb-dot"></span><input id="projectName" type="text" maxlength="100" value="未命名作图" aria-label="项目名称" data-i18n-aria="projectName" autocomplete="off" /></div><span class="save-status" id="projectSaveState" role="status" aria-live="polite"></span></div>
           <div class="view-controls"><button class="view-button" id="zoomOutBtn" type="button" aria-label="缩小" data-i18n-aria="zoomOut">−</button><button class="zoom-readout" id="zoomReadout" type="button" aria-label="重置视图" data-i18n-aria="resetView">100%</button><button class="view-button" id="zoomInBtn" type="button" aria-label="放大" data-i18n-aria="zoomIn">＋</button><span class="view-divider"></span><button class="view-button" id="resetViewBtn" type="button" aria-label="重置视图" data-i18n-aria="resetView">⌗</button></div>
+        </div>
+        <div class="classic-case-banner is-hidden" id="classicCaseBanner" role="status">
+          <div class="classic-case-banner-copy"><span class="section-kicker" data-i18n="classicCaseActive">当前案例</span><strong id="classicCaseBannerTitle"></strong><p id="classicCaseBannerDescription"></p></div>
+          <button class="button button-ghost button-compact" id="classicCaseBackBtn" type="button" data-i18n="classicCaseBrowse">浏览案例</button>
         </div>
         <div class="canvas-frame">
           <div class="canvas-surface" id="canvasSurface" tabindex="0" role="application" aria-label="几何作图画布" data-i18n-aria="canvasSurface">
@@ -129,10 +135,16 @@
             <button id="resetSegmentColor" type="button" disabled data-i18n="resetSegmentColor">默认</button>
           </div>
         </div>
-        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.bold.title">加粗</span><kbd>B</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div><div><span data-i18n="tool.bisector.title">两点垂直中分线</span><kbd>M</kbd></div><div><span data-i18n="tool.perpendicular.title">过点作垂线</span><kbd>P</kbd></div><div><span data-i18n="tool.angleBisector.title">角平分线</span><kbd>G</kbd></div><div><span data-i18n="tool.intersections.title">精确选交点</span><kbd>I</kbd></div></div></div>
+        <div class="inspector-section shortcuts-section"><div class="inspector-heading"><span class="section-kicker" data-i18n="shortcuts">快捷键</span></div><div class="shortcut-list"><div><span data-i18n="tool.select.title">选择 / 添加点</span><kbd>V</kbd></div><div><span data-i18n="tool.bold.title">加粗</span><kbd>B</kbd></div><div><span data-i18n="tool.lineQuick.title">两点画直线</span><kbd>D</kbd></div><div><span data-i18n="tool.line.title">定向截取线段</span><kbd>L</kbd></div><div><span data-i18n="tool.circleQuick.title">画圆</span><kbd>O</kbd></div><div><span data-i18n="tool.arcThreePoint.title">三点画弧</span><kbd>A</kbd></div><div><span data-i18n="tool.radius.title">定半径画弧</span><kbd>R</kbd></div><div><span data-i18n="reuseRadiusShortcut">使用当前半径</span><kbd>C</kbd></div><div><span data-i18n="tool.bisector.title">两点垂直中分线</span><kbd>M</kbd></div><div><span data-i18n="tool.perpendicular.title">过点作垂线</span><kbd>P</kbd></div><div><span data-i18n="tool.angleBisector.title">角平分线</span><kbd>G</kbd></div><div><span data-i18n="tool.intersections.title">精确选交点</span><kbd>I</kbd></div></div></div>
       </aside>
     </section>
   </main>
+  <dialog class="classic-cases-dialog" id="classicCasesDialog" aria-labelledby="classicCasesDialogTitle">
+    <div class="projects-dialog-heading"><div><h2 id="classicCasesDialogTitle" data-i18n="classicCasesTitle">经典作图案例</h2><p class="dialog-subtitle" data-i18n="classicCasesIntro">选择一个案例，载入初始图形后继续作图。这里不评分，也不自动判断完成。</p></div><button class="icon-button" id="closeClassicCasesBtn" type="button" aria-label="关闭案例列表" data-i18n-aria="closeClassicCases">×</button></div>
+    <div class="classic-cases-toolbar"><label class="sr-only" for="classicCasesSearch" data-i18n="classicCasesSearchLabel">搜索案例</label><input id="classicCasesSearch" type="search" data-i18n-placeholder="classicCasesSearchPlaceholder" placeholder="搜索案例或描述" autocomplete="off" /><select id="classicCasesPack"><option value="" data-i18n="allPacks">全部章节</option></select></div>
+    <div class="classic-cases-list" id="classicCasesList"></div>
+    <p class="classic-cases-attribution"><span data-i18n="classicCasesAttribution">案例题目参考 Euclidea 的公开关卡目录。</span> <a href="https://www.euclidea.xyz/" target="_blank" rel="noreferrer">Euclidea</a> · <a href="https://livephysics.com/tools/compass-and-straightedge-explorer/" target="_blank" rel="noreferrer">LivePhysics Explorer</a></p>
+  </dialog>
   <dialog class="projects-dialog" id="projectsDialog" aria-labelledby="projectsDialogTitle">
     <div class="projects-dialog-heading"><h2 id="projectsDialogTitle" data-i18n="savedProjects">已保存的项目</h2><button class="icon-button" id="closeProjectsBtn" type="button" aria-label="关闭项目列表" data-i18n-aria="closeProjects" data-i18n-title="closeProjects">×</button></div>
     <ul class="saved-projects-list" id="savedProjectsList"></ul>
@@ -143,6 +155,7 @@
     </div>
     <input id="importProjectFile" type="file" accept=".json,application/json" hidden />
   </dialog>
+  <script src="./classic-cases.js"></script>
   <script src="./project-store.js"></script>
   <script src="./app.js"></script>
   <script src="./history.js"></script>

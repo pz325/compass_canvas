@@ -45,7 +45,7 @@ const translations = {
     helperSelect: "点击线段或弧段可修改这一段的属性；点击空白处添加点。", helperRadius: "依次点击两个点，以两点距离作为圆规半径。也可以在右侧输入框直接设定。",
     helperLine: "先点取两个对齐点确定直线方向，再在线上点取线段起点和终点。", helperCompass: "先点圆心，再点圆周上的起点和终点。弧线会严格保持当前半径。", helperCompassArc: "依次点击圆心、圆周上的起点和终点，按当前半径画出对应圆弧。", helperCompassCircle: "点击圆心，再点击确认整圆；使用右侧切换按钮可改为画弧。", helperLineQuick: "依次点击两个点，立即画出经过这两个点的线段。", helperArcThreePoint: "依次点击圆心、弧起点和弧终点；半径由圆心到起点的距离决定。",
     noCompassRadius: "尚未设定圆规半径。", languageToggle: "切换语言", selectedAux: "已选中辅助对象", selectedPoint: "已选点 ({x}, {y})",
-    toolGroupLines: "直线", toolGroupArcs: "圆弧", reuseRadius: "使用当前半径（C）", reuseRadiusShortcut: "使用当前半径",
+    toolGroupLines: "直线", toolGroupArcs: "圆与圆弧", reuseRadius: "使用当前半径（C）", reuseRadiusShortcut: "使用当前半径",
     statusArcThreeCenter: "已记录圆心，请点击弧起点，同时确定半径。",
     stateQuickArc: "三点画弧中", stateQuickArcHint: "第二点确定本次圆弧半径；终点吸附到该圆周。",
     stateQuickArcRadiusHint: "本次圆弧半径 {radius} px；请选择圆周上的终点。",
@@ -89,7 +89,7 @@ const translations = {
     helperSelect: "Click a segment or arc to edit that piece, or click empty space to add a point.", helperRadius: "Pick two points in order to use their distance as the compass radius, or enter a value on the right.",
     helperLine: "Pick two alignment points to set the direction, then choose the segment start and end on the guide line.", helperCompass: "Pick a center, then the start and end directions on the circle. The arc keeps the current radius.", helperCompassArc: "Click the center, then the start and end points on the circle to draw the arc at the current radius.", helperCompassCircle: "Click the center, then click again to confirm a full circle. Use the switch to draw an arc.", helperLineQuick: "Click two points in order to immediately draw the segment between them.", helperArcThreePoint: "Click the center, arc start, and arc end; the radius comes from the center to the start.",
     noCompassRadius: "The compass radius is not set.", languageToggle: "Switch language", selectedAux: "Auxiliary object selected", selectedPoint: "Point selected ({x}, {y})",
-    toolGroupLines: "Lines", toolGroupArcs: "Arcs", reuseRadius: "Use held radius (C)", reuseRadiusShortcut: "Use held radius",
+    toolGroupLines: "Lines", toolGroupArcs: "Circles & arcs", reuseRadius: "Use held radius (C)", reuseRadiusShortcut: "Use held radius",
     statusArcThreeCenter: "Center recorded. Click the arc start to set its radius.",
     stateQuickArc: "Center–start–end arc", stateQuickArcHint: "The second point sets this arc’s radius; the end snaps to that circle.",
     stateQuickArcRadiusHint: "Arc radius: {radius} px. Choose the end on the circle.",
@@ -99,6 +99,10 @@ const translations = {
 };
 
 Object.assign(translations.zh, {
+  "tool.circleQuick.title": "画圆", "tool.circleQuick.desc": "圆心 → 第二点确认半径",
+  statusCircleQuick: "画圆：点击第一个点确定圆心。", statusCircleQuickRadius: "移动鼠标预览圆，点击第二个点确定半径并完成整圆。",
+  stateQuickCircle: "两点画圆中", stateQuickCircleHint: "第一点是圆心，第二点确定半径，直接画出整圆。",
+  quickCircleRadius: "本次圆的半径", circleRadiusSourceHint: "半径来源：圆心到第二点的距离，点击确认后记录。",
   toolGroupQuick: "快捷作图",
   "tool.bisector.title": "垂直中分线", "tool.bisector.desc": "两点确定垂直中分线",
   "tool.perpendicular.title": "过点作垂线", "tool.perpendicular.desc": "先选点，再选线段",
@@ -116,6 +120,10 @@ Object.assign(translations.zh, {
   helperIntersectionReady: "交点已高亮，可切换工具继续取点。点击新对象可重新选择一对；Esc 清除高亮。",
 });
 Object.assign(translations.en, {
+  "tool.circleQuick.title": "Draw circle", "tool.circleQuick.desc": "Center → point to set radius",
+  statusCircleQuick: "Draw circle: click the first point to set the center.", statusCircleQuickRadius: "Move to preview the circle, then click the second point to set its radius and complete it.",
+  stateQuickCircle: "Two-point circle", stateQuickCircleHint: "The first point is the center; the second sets the radius and completes the circle.",
+  quickCircleRadius: "This circle’s radius", circleRadiusSourceHint: "Radius source: the distance from the center to the second point, recorded when confirmed.",
   toolGroupQuick: "Quick constructions",
   "tool.bisector.title": "Perpendicular bisector", "tool.bisector.desc": "Pick two points to bisect",
   "tool.perpendicular.title": "Perpendicular through point", "tool.perpendicular.desc": "Pick a point, then a segment",
@@ -132,6 +140,8 @@ Object.assign(translations.en, {
   statusIntersectionReady: "Highlighted {count} intersections. Switch tools to snap to them first when nearby; Esc clears highlights.",
   helperIntersectionReady: "Intersections highlighted. Switch tools to use them, click a new object to choose another pair, or press Esc to clear.",
 });
+Object.assign(translations.zh, { classicCases: "经典案例", classicCasesTitle: "经典作图案例", classicCasesIntro: "选择一个案例，载入初始图形后继续作图。这里不评分，也不自动判断完成。", classicCasesSearchLabel: "搜索案例", classicCasesSearchPlaceholder: "搜索案例或描述", allPacks: "全部章节", closeClassicCases: "关闭案例列表", classicCasesAttribution: "案例题目参考 Euclidea 的公开关卡目录。", classicCaseActive: "当前案例", classicCaseBrowse: "浏览案例", loadClassicCase: "载入案例", classicCasePack: "第 {number} 章", classicCaseEmpty: "没有符合条件的案例。", classicCaseLoaded: "案例已载入，可以继续作图。", classicCaseNoInitial: "该案例没有可显示的初始图形，请直接阅读任务说明。" });
+Object.assign(translations.en, { classicCases: "Classic cases", classicCasesTitle: "Classic construction cases", classicCasesIntro: "Choose a case, load its initial diagram, and continue constructing it yourself. There is no scoring or automatic completion check.", classicCasesSearchLabel: "Search cases", classicCasesSearchPlaceholder: "Search by title or description", allPacks: "All chapters", closeClassicCases: "Close case list", classicCasesAttribution: "Problem statements are referenced from the public Euclidea level catalogue.", classicCaseActive: "Active case", classicCaseBrowse: "Browse cases", loadClassicCase: "Load case", classicCasePack: "Chapter {number}", classicCaseEmpty: "No cases match this filter.", classicCaseLoaded: "Case loaded. Continue constructing it.", classicCaseNoInitial: "This case has no supported initial diagram; read the task description and start drawing." });
 
 function t(key, vars = {}) {
   const lang = state?.language || "zh";
@@ -174,6 +184,14 @@ const compassLiveLabel = document.querySelector("#compassLiveLabel");
 const finalizeBtn = document.querySelector("#finalizeBtn");
 const segmentColor = document.querySelector("#segmentColor");
 const resetSegmentColor = document.querySelector("#resetSegmentColor");
+const classicCasesBtn = document.querySelector("#classicCasesBtn");
+const classicCasesDialog = document.querySelector("#classicCasesDialog");
+const classicCasesList = document.querySelector("#classicCasesList");
+const classicCasesSearch = document.querySelector("#classicCasesSearch");
+const classicCasesPack = document.querySelector("#classicCasesPack");
+const classicCaseBanner = document.querySelector("#classicCaseBanner");
+const classicCaseBannerTitle = document.querySelector("#classicCaseBannerTitle");
+const classicCaseBannerDescription = document.querySelector("#classicCaseBannerDescription");
 let constructionHistory = null;
 let radiusSourceSequence = 0;
 let radiusSliderEditing = false;
@@ -188,6 +206,8 @@ function radiusSource(kind, radius, points = [], method = "manual") {
 }
 
 function editingBlocked() { return Boolean(constructionHistory?.playback.active); }
+
+function usesOwnRadius(mode = state.mode) { return mode === "arcThreePoint" || mode === "circleQuick"; }
 
 const state = {
   language: initialLanguage,
@@ -222,9 +242,11 @@ const state = {
   panStart: null,
   history: [],
   spacePressed: false,
+  classicCase: null,
 };
 
 const toolCopy = {
+  circleQuick: { titleKey: "tool.circleQuick.title", helperKey: "statusCircleQuick" },
   bisector: { titleKey: "tool.bisector.title", helperKey: "statusBisector" },
   perpendicular: { titleKey: "tool.perpendicular.title", helperKey: "statusPerpendicular" },
   angleBisector: { titleKey: "tool.angleBisector.title", helperKey: "statusAngleFirst" },
@@ -267,7 +289,10 @@ function el(tag, attrs = {}, text = null) {
 }
 
 function clonePoint(p) {
-  return { x: p.x, y: p.y };
+  const point = { x: p.x, y: p.y };
+  if (p.id) point.id = p.id;
+  if (p.label) point.label = p.label;
+  return point;
 }
 
 function distance(a, b) {
@@ -450,7 +475,12 @@ function splitEntityAtPoints(entity, points) {
     }
     if (boundaries.length === 1) return [entity];
     boundaries.push(1);
-    const at = (position) => ({ x: entity.p1.x + position * dx, y: entity.p1.y + position * dy });
+    const at = (position) => {
+      const point = { x: entity.p1.x + position * dx, y: entity.p1.y + position * dy };
+      if (position <= tolerance / length && entity.p1.label) point.label = entity.p1.label;
+      if (1 - position <= tolerance / length && entity.p2.label) point.label = entity.p2.label;
+      return point;
+    };
     return boundaries.slice(0, -1).map((position, index) => ({
       ...entity, p1: at(position), p2: at(boundaries[index + 1]),
     }));
@@ -625,6 +655,10 @@ function applyLanguage() {
     const key = node.dataset.i18nTitle;
     if (key) node.setAttribute("title", t(key));
   });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    const key = node.dataset.i18nPlaceholder;
+    if (key) node.setAttribute("placeholder", t(key));
+  });
   if (languageToggle) {
     languageToggle.textContent = lang === "zh" ? "EN" : "中文";
     languageToggle.setAttribute("aria-label", t("languageToggle"));
@@ -659,6 +693,7 @@ function currentStep() {
   if (state.mode === "intersections") return { key: state.intersectionSelection.length ? "statusIntersectionSecond" : state.priorityIntersections.length ? "helperIntersectionReady" : "statusIntersectionFirst", number: state.intersectionSelection.length || state.priorityIntersections.length ? 2 : 1, total: 2 };
   if (state.mode === "bold") return { key: "helperBold", number: 1, total: 1 };
   if (state.mode === "lineQuick") return { key: n ? "statusLineQuickSecond" : "statusLineQuick", number: n + 1, total: 2 };
+  if (state.mode === "circleQuick") return { key: n ? "statusCircleQuickRadius" : "statusCircleQuick", number: n + 1, total: 2 };
   if (state.mode === "arcThreePoint") return { key: ["statusArcThreePoint", "statusArcThreeCenter", "statusArcThreeStart"][n], number: n + 1, total: 3 };
   if (state.mode === "line") return { key: ["statusLine", "statusLineFirst", "statusLineDirection", "statusLineStart"][n], number: n + 1, total: 4 };
   if (state.mode === "radius") return { key: n ? "statusRadiusFirst" : "statusRadius", number: n + 1, total: state.arcMode === "circle" ? 4 : 5 };
@@ -682,9 +717,10 @@ function updateToolCopy() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
-  document.querySelector("#arcModeToggle").classList.toggle("active", state.arcMode === "circle");
-  document.querySelector("#arcModeLabel").textContent = t(state.arcMode === "circle" ? "arcCircle" : "arcDraw");
-  document.querySelector("#arcModeToggle").disabled = state.mode === "arcThreePoint";
+  const circleMode = state.mode === "circleQuick" || (!usesOwnRadius() && state.arcMode === "circle");
+  document.querySelector("#arcModeToggle").classList.toggle("active", circleMode);
+  document.querySelector("#arcModeLabel").textContent = t(circleMode ? "arcCircle" : "arcDraw");
+  document.querySelector("#arcModeToggle").disabled = usesOwnRadius();
   updateCompassStateUI();
 }
 
@@ -694,7 +730,12 @@ function updateCompassStateUI() {
   let label = t("stateIdle");
   let hint = t("stateIdleHint");
   let live = t("liveIdle");
-  if (state.mode === "arcThreePoint") {
+  if (state.mode === "circleQuick") {
+    cardState = "setting";
+    label = t("stateQuickCircle");
+    hint = t(state.pending.length ? "statusCircleQuickRadius" : "stateQuickCircleHint");
+    live = t("liveSetting");
+  } else if (state.mode === "arcThreePoint") {
     cardState = state.pending.length === 2 ? "ready" : "setting";
     label = t("stateQuickArc");
     hint = state.pending.length === 2
@@ -729,9 +770,11 @@ function syncRadiusControls() {
   radiusSlider.value = Math.max(20, Math.min(300, state.radius));
   const quickRadius = state.mode === "arcThreePoint" && state.pending.length === 2
     ? distance(state.pending[0], state.pending[1]) : null;
+  const choosingCircleRadius = state.mode === "circleQuick" && state.pending.length === 1;
+  const circleRadius = choosingCircleRadius && state.pointer.inside && state.previewPoint ? distance(state.pending[0], state.previewPoint) : null;
   const selectedRadius = state.selectedEntity?.radius ?? null;
-  document.querySelector("#radiusReadout").textContent = `${Math.round((quickRadius ?? selectedRadius ?? state.radius) * 10) / 10} px`;
-  document.querySelector(".radius-unit").textContent = t(quickRadius !== null ? "quickArcRadius" : selectedRadius !== null ? "selectedArcRadius" : state.mode === "arcThreePoint" ? "heldRadius" : "currentRadius");
+  document.querySelector("#radiusReadout").textContent = choosingCircleRadius && circleRadius === null ? "—" : `${Math.round((circleRadius ?? quickRadius ?? selectedRadius ?? state.radius) * 10) / 10} px`;
+  document.querySelector(".radius-unit").textContent = t(choosingCircleRadius ? "quickCircleRadius" : quickRadius !== null ? "quickArcRadius" : selectedRadius !== null ? "selectedArcRadius" : usesOwnRadius() ? "heldRadius" : "currentRadius");
   updateCompassStateUI();
 }
 
@@ -816,12 +859,12 @@ function commitEntity(entity, construction = null) {
   const alignment = method === "line" ? state.pending.slice(0, 2).map(clonePoint) : [];
   entity.constructionId = constructionHistory?.nextStepId() || `drawing-${state.history.length}`;
   if (entity.type !== "line") {
-    const source = method === "arcThreePoint" ? state.quickRadiusSource : state.radiusSource;
+    const source = usesOwnRadius(method) ? state.quickRadiusSource : state.radiusSource;
     const origin = source?.kind === "reuse" ? source.origin : source;
     const previousUse = constructionHistory?.project.steps.findLast((step) => step.kind === "draw" && step.data.geometry?.radiusSource?.sourceId === source?.sourceId);
     const previousArcStep = state.lastArc?.source?.sourceId === source?.sourceId ? state.lastArc.stepId : previousUse?.id;
     entity.radiusSource = JSON.parse(JSON.stringify(source || radiusSource("free", entity.radius)));
-    if (method !== "arcThreePoint" && previousArcStep) {
+    if (!usesOwnRadius(method) && previousArcStep) {
       entity.radiusSource = { kind: "reuse", radius: entity.radius, sourceId: source.sourceId, fromStepId: previousArcStep, origin };
     }
     state.lastArc = { stepId: entity.constructionId, radius: entity.radius, source: JSON.parse(JSON.stringify(entity.radiusSource)) };
@@ -1145,6 +1188,25 @@ function performCanvasClick(rawPoint) {
     return;
   }
 
+  if (state.mode === "circleQuick") {
+    if (state.pending.length === 0) {
+      state.pendingOrigins = [pointKinds().some((item) => pointNear(item.point, point))];
+      state.pending = [point];
+      addOperationPoint(point);
+      setStatus("statusCircleQuickRadius");
+    } else {
+      const center = state.pending[0];
+      const radius = distance(center, point);
+      if (radius < 4) { setStatus("statusArcSame"); return; }
+      const existingPoint = pointKinds().some((item) => pointNear(item.point, point));
+      state.quickRadiusSource = radiusSource(state.pendingOrigins[0] && existingPoint ? "points" : "free", radius, [center, point], "center-radius-point");
+      addOperationPoint(point);
+      commitEntity({ type: "circle", center: clonePoint(center), radius });
+    }
+    render();
+    return;
+  }
+
   if (state.mode === "arcThreePoint") {
     if (state.pending.length === 0) {
       state.pendingOrigins = [pointKinds().some((item) => pointNear(item.point, point))];
@@ -1364,6 +1426,18 @@ function renderQuickPreview() {
 function renderPreview() {
   referenceLayer.replaceChildren();
   quickOverlayLayer.replaceChildren();
+  if (state.mode === "circleQuick") {
+    syncRadiusControls();
+    if (state.pending.length === 1) {
+      const center = state.pending[0];
+      referenceLayer.appendChild(el("circle", { cx: center.x, cy: center.y, r: 5 / state.scale, class: "reference-point" }));
+      if (state.pointer.inside && state.previewPoint) {
+        const radius = distance(center, state.previewPoint);
+        if (radius >= 4) renderCircularPreview(center, radius, null, state.previewPoint);
+      }
+    }
+    return;
+  }
   if (renderQuickPreview()) return;
   const pending = state.pending;
   if (state.mode === "lineQuick") {
@@ -1461,6 +1535,7 @@ function renderPoints() {
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: isIntersection ? 3.5 : 3, class: "point-visual" }));
     node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hover-ring" }));
     if (!isStandalone) node.appendChild(el("circle", { cx: point.x, cy: point.y, r: 11, class: "point-hit-area" }));
+    if (point.label) node.appendChild(el("text", { x: point.x + 10 / state.scale, y: point.y - 10 / state.scale, "font-size": 18 / state.scale, class: "case-point-label" }, point.label));
     const label = el("title", {}, isIntersection ? t("pointIntersectionTitle") : t("pointInteractiveTitle"));
     node.appendChild(label);
     node.addEventListener("keydown", (event) => {
@@ -1481,6 +1556,7 @@ function renderPoints() {
 function render() {
   updateToolCopy();
   syncRadiusControls();
+  updateClassicCaseBanner();
   geometryLayer.replaceChildren();
   for (const entity of state.entities) {
     if (entity.type === "line") renderLine(entity, geometryLayer);
@@ -1518,6 +1594,109 @@ function resetView() {
   renderPreview();
   if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
   constructionHistory?.viewChanged();
+}
+
+function classicCaseText(item, field) {
+  if (!item) return "";
+  const localized = item[`${field}${state.language === "zh" ? "Zh" : "En"}`];
+  return localized && !/[\u0400-\u04ff]/.test(localized) ? localized : item[`${field}En`] || "";
+}
+
+function fitClassicCaseScene(item) {
+  const source = item.initial || { entities: [], points: [] };
+  const points = source.points.map(clonePoint);
+  const entities = JSON.parse(JSON.stringify(source.entities));
+  const bounds = [...points];
+  for (const entity of entities) {
+    if (entity.type === "line") bounds.push(entity.p1, entity.p2);
+    else bounds.push({ x: entity.center.x - entity.radius, y: entity.center.y - entity.radius }, { x: entity.center.x + entity.radius, y: entity.center.y + entity.radius });
+  }
+  const xs = bounds.map((p) => p.x), ys = bounds.map((p) => p.y);
+  const minX = bounds.length ? Math.min(...xs) : -300, maxX = bounds.length ? Math.max(...xs) : 300;
+  const minY = bounds.length ? Math.min(...ys) : -200, maxY = bounds.length ? Math.max(...ys) : 200;
+  const scale = Math.min(1.8, 900 / Math.max(1, maxX - minX), 560 / Math.max(1, maxY - minY));
+  const map = (p) => ({ ...clonePoint(p), x: (p.x - (minX + maxX) / 2) * scale + WIDTH / 2, y: (p.y - (minY + maxY) / 2) * scale + HEIGHT / 2 });
+  const mapped = entities.map((entity, index) => {
+    const result = entity.type === "line" ? { ...entity, p1: map(entity.p1), p2: map(entity.p2) } : { ...entity, center: map(entity.center), radius: entity.radius * scale };
+    // A case's supplied geometry is the visible problem setup, so keep it
+    // prominent while new constructions remain light auxiliary guides.
+    result.final = true;
+    result.constructionId = `case-${item.id}-initial-${index + 1}`;
+    if (result.type === "circle") result.radiusSource = { kind: "free", radius: result.radius, points: [], method: "case", sourceId: `${result.constructionId}-radius` };
+    return result;
+  });
+  return { entities: mapped, freePoints: points.map(map) };
+}
+
+function updateClassicCaseBanner() {
+  if (!classicCaseBanner) return;
+  classicCaseBanner.classList.toggle("is-hidden", !state.classicCase);
+  classicCaseBannerTitle.textContent = classicCaseText(state.classicCase, "title");
+  classicCaseBannerDescription.textContent = classicCaseText(state.classicCase, "description");
+}
+
+function loadClassicCase(id) {
+  if (editingBlocked()) return;
+  const item = (globalThis.CLASSIC_CASES || []).find((candidate) => candidate.id === id);
+  if (!item) return;
+  if (constructionHistory) {
+    if (!constructionHistory.saveProject(false)) return;
+    constructionHistory.activateProject(constructionHistory.createProject());
+  }
+  const scene = fitClassicCaseScene(item);
+  state.classicCase = Object.fromEntries(["id", "titleEn", "titleZh", "descriptionEn", "descriptionZh", "sourceUrl", "source"].map((key) => [key, item[key] || ""]));
+  state.entities = splitEntitiesAtIntersections(scene.entities);
+  state.freePoints = scene.freePoints;
+  state.pending = []; state.operationPoints = []; state.lineGuide = null;
+  state.intersectionSelection = []; state.priorityIntersections = [];
+  state.selectedPoint = null; state.selectedEntity = null; state.previewPoint = null; state.history = [];
+  state.radius = 150; state.radiusReady = false;
+  state.radiusSource = radiusSource("free", 150, [], "default");
+  state.quickRadiusSource = null; state.lastArc = null; state.pendingOrigins = [];
+  state.mode = "select"; state.arcMode = "arc"; state.radiusPicking = false;
+  state.panX = 0; state.panY = 0; state.scale = 1;
+  if (constructionHistory) {
+    constructionHistory.project.case = JSON.parse(JSON.stringify(state.classicCase));
+    constructionHistory.project.title = classicCaseText(item, "title");
+    constructionHistory.project.initialScene = constructionHistory.captureScene();
+    constructionHistory.project.scene = constructionHistory.captureScene();
+    constructionHistory.project.steps = []; constructionHistory.project.pointCatalog = []; constructionHistory.project.undoHistory = [];
+    constructionHistory.node("projectName").value = constructionHistory.project.title;
+    constructionHistory.dirty = true; constructionHistory.savedOnce = false;
+  }
+  if (classicCasesDialog?.open) classicCasesDialog.close();
+  render();
+  setStatus(scene.entities.length || scene.freePoints.length ? "classicCaseLoaded" : "classicCaseNoInitial");
+  constructionHistory?.saveProject(false);
+}
+
+function renderClassicCaseList() {
+  if (!classicCasesList) return;
+  const query = (classicCasesSearch?.value || "").trim().toLowerCase(), pack = classicCasesPack?.value || "";
+  const cases = (globalThis.CLASSIC_CASES || []).filter((item) => (!query || `${item.titleEn} ${item.titleZh} ${item.descriptionEn} ${item.descriptionZh}`.toLowerCase().includes(query)) && (!pack || item.packId === pack));
+  classicCasesList.replaceChildren();
+  if (!cases.length) { const empty = document.createElement("p"); empty.textContent = t("classicCaseEmpty"); classicCasesList.appendChild(empty); return; }
+  for (const item of cases) {
+    const card = document.createElement("article"); card.className = "classic-case-card";
+    const title = document.createElement("h3"); title.textContent = classicCaseText(item, "title"); card.appendChild(title);
+    const detail = document.createElement("small"); detail.textContent = `${t("classicCasePack", { number: item.packNumber })} · ${item.packId}`; card.appendChild(detail);
+    const desc = document.createElement("p"); desc.textContent = classicCaseText(item, "description"); card.appendChild(desc);
+    const button = document.createElement("button"); button.type = "button"; button.className = "button button-ghost button-compact"; button.textContent = t("loadClassicCase"); button.addEventListener("click", () => loadClassicCase(item.id)); card.appendChild(button);
+    classicCasesList.appendChild(card);
+  }
+}
+
+function openClassicCases() {
+  if (classicCasesPack) {
+    const value = classicCasesPack.value;
+    classicCasesPack.replaceChildren();
+    const all = document.createElement("option"); all.value = ""; all.textContent = t("allPacks"); classicCasesPack.appendChild(all);
+    const packs = new Map((globalThis.CLASSIC_CASES || []).map((item) => [item.packId, item.packNumber]));
+    for (const [id, number] of packs) { const option = document.createElement("option"); option.value = id; option.textContent = `${t("classicCasePack", { number })} · ${id}`; classicCasesPack.appendChild(option); }
+    classicCasesPack.value = value;
+  }
+  renderClassicCaseList();
+  if (classicCasesDialog && !classicCasesDialog.open) classicCasesDialog.showModal();
 }
 
 function undo() {
@@ -1610,7 +1789,7 @@ if (languageToggle) languageToggle.addEventListener("click", () => {
   applyLanguage();
 });
 document.querySelector("#arcModeToggle").addEventListener("click", () => {
-  if (editingBlocked() || state.mode === "arcThreePoint") return;
+  if (editingBlocked() || usesOwnRadius()) return;
   if (state.mode !== "select") clearOperationPoints();
   state.arcMode = state.arcMode === "arc" ? "circle" : "arc";
   state.pending = [];
@@ -1671,6 +1850,11 @@ document.querySelector("#zoomOutBtn").addEventListener("click", () => {
   if (editingBlocked()) constructionHistory.drawAnnotation(constructionHistory.project.steps[constructionHistory.playback.index - 1]);
 });
 document.querySelector("#zoomReadout").addEventListener("click", resetView);
+classicCasesBtn?.addEventListener("click", openClassicCases);
+document.querySelector("#closeClassicCasesBtn")?.addEventListener("click", () => classicCasesDialog?.close());
+document.querySelector("#classicCaseBackBtn")?.addEventListener("click", openClassicCases);
+classicCasesSearch?.addEventListener("input", renderClassicCaseList);
+classicCasesPack?.addEventListener("change", renderClassicCaseList);
 
 board.addEventListener("pointermove", (event) => {
   if (editingBlocked() && !state.isPanning) return;
@@ -1737,7 +1921,7 @@ board.addEventListener("wheel", (event) => {
 }, { passive: false });
 
 document.addEventListener("keydown", (event) => {
-  if (document.querySelector("#projectsDialog")?.open) return;
+  if (document.querySelector("#projectsDialog")?.open || classicCasesDialog?.open) return;
   if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName) || event.target.isContentEditable) return;
   if (event.code === "Space" && ["BUTTON", "SUMMARY"].includes(event.target.tagName)) return;
   if (editingBlocked() && event.key === "Escape") {
@@ -1770,7 +1954,7 @@ document.addEventListener("keydown", (event) => {
     if (canceled) recordConstruction("cancel");
   }
   if (!event.metaKey && !event.ctrlKey && !event.altKey) {
-    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint", m: "bisector", p: "perpendicular", g: "angleBisector", i: "intersections" }[event.key.toLowerCase()];
+    const shortcut = { v: "select", b: "bold", r: "radius", c: "compass", l: "line", d: "lineQuick", a: "arcThreePoint", o: "circleQuick", m: "bisector", p: "perpendicular", g: "angleBisector", i: "intersections" }[event.key.toLowerCase()];
     if (shortcut && event.target.tagName !== "INPUT") setMode(shortcut);
   }
 });

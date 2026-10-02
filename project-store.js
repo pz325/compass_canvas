@@ -7,7 +7,7 @@
   const LIBRARY_FORMAT = "compasscanvas-library";
   const MAX_BYTES = 15 * 1024 * 1024;
   const MAX_ITEMS = 10000;
-  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint", "bisector", "perpendicular", "angleBisector", "intersections"]);
+  const MODES = new Set(["select", "bold", "line", "lineQuick", "radius", "compass", "arcThreePoint", "circleQuick", "bisector", "perpendicular", "angleBisector", "intersections"]);
   const STEP_KINDS = new Set(["tool", "point", "pick", "radius", "draw", "style", "undo", "cancel", "clear", "objectPick", "intersection"]);
   const UNSAFE_KEYS = new Set(["__proto__", "prototype", "constructor"]);
   const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
@@ -324,6 +324,13 @@
     if (project.format !== PROJECT_FORMAT || project.version !== 1) invalid("Unsupported project format or version.");
     text(project.id, "Project id", 160);
     text(project.title, "Project title", 200);
+    if (own(project, "case") && project.case !== null) {
+      object(project.case, "Project case");
+      text(project.case.id, "Project case id", 160);
+      for (const key of ["titleEn", "titleZh", "descriptionEn", "descriptionZh", "sourceUrl", "source"]) {
+        if (own(project.case, key) && typeof project.case[key] !== "string") invalid(`Project case ${key} must be text.`);
+      }
+    }
     for (const key of ["createdAt", "updatedAt"]) {
       text(project[key], `Project ${key}`, 64);
       if (!Number.isFinite(Date.parse(project[key]))) invalid(`Project ${key} is not a valid timestamp.`);
